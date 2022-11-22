@@ -4,7 +4,7 @@ import bcrypt from "bcrypt";
 
 import { env } from "../../../env/server.mjs";
 import { prisma } from "../../../server/db/client";
-import { loginSchema } from "@/validation/auth";
+import { ILogin, loginSchema } from "@/validation/auth";
 
 
 export const authOptions: NextAuthOptions = {
@@ -19,7 +19,7 @@ export const authOptions: NextAuthOptions = {
     },
     session({ session, token, user }) {
       if (token && session.user) {
-        session.user.id = token.id as number;
+        session.user.id = parseInt(token.id as string);
 
 
       }
@@ -46,7 +46,7 @@ export const authOptions: NextAuthOptions = {
         password: { label: "Password", type: "password" },
       },
       async authorize(credentials, req) {
-        const cred = await loginSchema.parseAsync(credentials);
+        const cred: ILogin = await loginSchema.parseAsync(credentials);
 
         const user = await prisma.user.findFirst({
           where: { email: cred.email },
@@ -66,7 +66,7 @@ export const authOptions: NextAuthOptions = {
         }
 
         return {
-          id: user.id,
+          id: (user.id).toString(),
           email: user.email,
           image: user.photo,
           name: user.name,
