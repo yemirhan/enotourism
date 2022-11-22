@@ -1,0 +1,253 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum UserType {
+  GUIDE
+  WINERY
+  TASTER
+}
+
+enum Gender {
+  MALE
+  FEMALE
+  OTHER
+}
+
+model User {
+  id           Int              @id @default(autoincrement())
+  email        String           @unique
+  password     String
+  name         String?
+  surname      String?
+  gender       Gender?          @default(OTHER)
+  phone_number String?
+  address      Address?
+  photo        String?          @default("https://media.istockphoto.com/id/1288129985/vector/missing-image-of-a-person-placeholder.jpg?s=612x612&w=0&k=20&c=9kE777krx5mrFHsxx02v60ideRWvIgI1RWzR1X4MG2Y=")
+  about        String?
+  user_type    UserType         @default(TASTER)
+  Winery       Winery[]
+  Tour         Tour[]
+  Reservation  Reservation[]
+  time_slots   GuideTimeSlots[]
+  createdAt    DateTime         @default(now())
+  updatedAt    DateTime         @updatedAt
+}
+
+model Address {
+  id                 Int       @id @default(autoincrement())
+  street             String
+  city               String
+  flat               String
+  address            String
+  is_contact_address Boolean
+  postcode           String
+  country            Country[]
+  region             Region[]
+  user_id            Int       @unique
+  user               User      @relation(fields: [user_id], references: [id])
+  Winery             Winery[]
+}
+
+model Country {
+  id          Int             @id @default(autoincrement())
+  name        String
+  photos      CountryPhotos[]
+  description String
+  Address     Address?        @relation(fields: [addressId], references: [id])
+  addressId   Int?
+}
+
+model CountryPhotos {
+  id        Int     @id @default(autoincrement())
+  countryId Int
+  country   Country @relation(fields: [countryId], references: [id])
+  url       String
+}
+
+model RegionPhotos {
+  id       Int    @id @default(autoincrement())
+  regionId Int
+  region   Region @relation(fields: [regionId], references: [id])
+  url      String
+}
+
+model Region {
+  id          Int            @id @default(autoincrement())
+  name        String
+  photos      RegionPhotos[]
+  description String
+  Address     Address?       @relation(fields: [addressId], references: [id])
+  addressId   Int?
+}
+
+model Winery {
+  id           Int            @id @default(autoincrement())
+  name         String
+  description  String
+  photos       WineryPhotos[]
+  address      Address?       @relation(fields: [addressId], references: [id])
+  addressId    Int?
+  email        String
+  history      String
+  awards       String
+  language     Language[]
+  owner        User           @relation(fields: [userId], references: [id])
+  userId       Int
+  WorkingHours WorkingHours[]
+  Tour         Tour[]
+  Wine         Wine[]
+  Offer        Offer[]
+}
+
+model WineryPhotos {
+  id       Int    @id @default(autoincrement())
+  wineryId Int
+  winery   Winery @relation(fields: [wineryId], references: [id])
+  url      String
+}
+
+model Language {
+  id       Int     @id @default(autoincrement())
+  name     String
+  flag     String
+  Winery   Winery? @relation(fields: [wineryId], references: [id])
+  wineryId Int?
+}
+
+model WorkingHours {
+  id       Int     @id @default(autoincrement())
+  day      String
+  open     String
+  close    String
+  Winery   Winery? @relation(fields: [wineryId], references: [id])
+  wineryId Int?
+}
+
+model Tour {
+  id               Int    @id @default(autoincrement())
+  name             String
+  description      String
+  number_of_people Int
+  Winery           Winery @relation(fields: [wineryId], references: [id])
+  wineryId         Int
+  tour_guide       User   @relation(fields: [userId], references: [id])
+  userId           Int
+}
+
+model Wine {
+  id                Int      @id @default(autoincrement())
+  name              String
+  brief_description String
+  wine_type         WineType @relation(fields: [wineTypeId], references: [id])
+  Winery            Winery   @relation(fields: [wineryId], references: [id])
+  wineryId          Int
+  wineTypeId        Int
+}
+
+model WineType {
+  id      Int    @id @default(autoincrement())
+  name    String
+  color   String
+  taste   String
+  grapes  String
+  texture String
+  Wine    Wine[]
+}
+
+model Offer {
+  id                   Int             @id @default(autoincrement())
+  name                 String
+  description          String
+  price                Int
+  winery               Winery          @relation(fields: [wineryId], references: [id])
+  offer_types          OfferType[]
+  adult_price          Decimal
+  kid_price            Decimal
+  photos               OfferPhoto[]
+  max_number_of_people Int
+  duration             Int
+  wineryId             Int
+  OfferTimeSlot        OfferTimeSlot[]
+  Reservation          Reservation[]
+}
+
+model OfferPhoto {
+  id      Int    @id @default(autoincrement())
+  offerId Int
+  offer   Offer  @relation(fields: [offerId], references: [id])
+  url     String
+}
+
+model OfferType {
+  id      Int    @id @default(autoincrement())
+  name    String
+  offers  Offer  @relation(fields: [offerId], references: [id])
+  offerId Int
+}
+
+model OfferTimeSlot {
+  id        Int      @id @default(autoincrement())
+  date      DateTime
+  startTime Int
+  endTime   Int
+  offerId   Int
+  offer     Offer    @relation(fields: [offerId], references: [id])
+}
+
+enum StatusType {
+  PENDING
+  ACCEPTED
+  REJECTED
+  DONE
+}
+
+enum Days {
+  MONDAY
+  TUESDAY
+  WEDNESDAY
+  THURSDAY
+  FRIDAY
+  SATURDAY
+  SUNDAY
+}
+
+model GuideTimeSlots {
+  id        Int  @id @default(autoincrement())
+  date      Days
+  startTime Int
+  endTime   Int
+  guideId   Int
+  guide     User @relation(fields: [guideId], references: [id])
+}
+
+model Status {
+  id     Int        @id @default(autoincrement())
+  status StatusType @default(PENDING)
+
+  Reservation Reservation[]
+}
+
+model Reservation {
+  id               Int      @id @default(autoincrement())
+  date             DateTime
+  from_time        Int
+  to_time          Int
+  slug             String
+  number_of_people Int
+  number_of_kids   Int
+  offerId          Int
+  offer            Offer    @relation(fields: [offerId], references: [id])
+  statusId         Int
+  status           Status   @relation(fields: [statusId], references: [id])
+  userId           Int
+  user             User     @relation(fields: [userId], references: [id])
+}
