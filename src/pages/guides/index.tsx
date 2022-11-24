@@ -28,6 +28,7 @@ const Guides = () => {
                     <SimpleGrid cols={4}>
                         {guides?.map((guide) => {
                             return <GuideCard key={guide.id}
+                                id={guide.id}
                                 category={guide.user_type}
                                 title={guide.name || ""}
                                 image={guide.photo || ""}

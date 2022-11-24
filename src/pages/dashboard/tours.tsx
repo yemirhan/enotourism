@@ -6,7 +6,7 @@ import { Container, Stack, Title } from '@mantine/core'
 import React from 'react'
 
 const Tours = () => {
-    const { data: tours, isLoading } = trpc.userTours.getToursOfUser.useQuery()
+    const { data: tours, isLoading } = trpc.userTours.getToursOfTourGuide.useQuery()
     return (
         <ProtectedLayout>
             <Container>

@@ -1,4 +1,3 @@
-import { trpc } from '@/utils/trpc';
 import {
     createStyles,
     Menu,
@@ -15,9 +14,10 @@ import {
     Avatar,
 } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
-import { IconChevronDown, IconGlassFull, IconHeart, IconLogout, IconMessage, IconPlayerPause, IconSettings, IconStar, IconSwitchHorizontal, IconTrash, IconUser } from '@tabler/icons';
+import { IconBarrel, IconBottle, IconCalendarEvent, IconChevronDown, IconGlassFull, IconHeart, IconLogout, IconMessage, IconPlayerPause, IconSettings, IconStar, IconSwitchHorizontal, IconTrash, IconUser } from '@tabler/icons';
 import { signOut, useSession } from 'next-auth/react';
 import Link from 'next/link';
+import { useRouter } from 'next/router';
 import { useState } from 'react';
 
 
@@ -57,6 +57,17 @@ const useStyles = createStyles((theme) => ({
         '&:hover': {
             backgroundColor: theme.colors.gray[0],
         },
+    },
+    linkSelected: {
+        display: 'block',
+        lineHeight: 1,
+        padding: '8px 12px',
+        borderRadius: theme.radius.sm,
+        textDecoration: 'none',
+        color: theme.white,
+        fontSize: theme.fontSizes.sm,
+        fontWeight: 500,
+        backgroundColor: theme.colors?.wine?.[6]
     },
 
     linkLabel: {
@@ -130,6 +141,7 @@ export function Header({ links }: HeaderActionProps) {
     const { classes } = useStyles();
     const session = useSession()
     const [opened, { toggle }] = useDisclosure(false);
+    const router = useRouter();
     const items = links.map((link) => {
         const menuItems = link.links?.map((item) => (
             <Menu.Item key={item.link}>{item.label}</Menu.Item>
@@ -159,7 +171,7 @@ export function Header({ links }: HeaderActionProps) {
             <Link
                 key={link.label}
                 href={link.link}
-                className={classes.link}
+                className={router.pathname.includes(link.link) ? classes.linkSelected : classes.link}
 
             >
                 {link.label}
@@ -196,13 +208,12 @@ export function Header({ links }: HeaderActionProps) {
 
 const RightSideSignedIn = () => {
     const session = useSession()
-    const { data: user, isLoading: isUserLoading } = trpc.profile.getProfile.useQuery()
     const { classes, theme, cx } = useStyles();
-    const [opened, { toggle }] = useDisclosure(false);
     const [userMenuOpened, setUserMenuOpened] = useState(false);
 
+
     return (
-        (session.status === "loading" || isUserLoading) ? <Loader size={30} /> : <Menu
+        (session.status === "loading") ? <Loader size={30} /> : <Menu
             width={260}
             position="bottom-end"
             transition="pop-top-right"
@@ -214,9 +225,9 @@ const RightSideSignedIn = () => {
                     className={cx(classes.user, { [classes.userActive]: userMenuOpened })}
                 >
                     <Group spacing={7}>
-                        <Avatar src={user?.photo || ""} alt={"profile_photo"} radius="xl" size={20} />
+                        <Avatar src={session.data?.user?.image || ""} alt={"profile_photo"} radius="xl" size={20} />
                         <Text weight={500} size="sm" sx={{ lineHeight: 1 }} mr={3}>
-                            {user?.name || "User"}
+                            {session.data?.user?.name || "User"}
                         </Text>
                         <IconChevronDown size={12} stroke={1.5} />
                     </Group>
@@ -226,6 +237,22 @@ const RightSideSignedIn = () => {
                 <Menu.Item component={Link} href="/dashboard/profile" icon={<IconUser size={14} stroke={1.5} />}>
                     Your Profile
                 </Menu.Item>
+                {session.data?.user?.user_type === "WINERY" ? <>
+                    <Menu.Item component={Link} href="/dashboard/your_wineries" icon={<IconBarrel size={14} stroke={1.5} />}>
+                        Your Wineries
+                    </Menu.Item>
+                    <Menu.Item component={Link} href="/dashboard/bookings" icon={<IconCalendarEvent size={14} stroke={1.5} />}>
+                        Bookings
+                    </Menu.Item>
+                </> : null}
+                {session.data?.user?.user_type === "GUIDE" ? <>
+                    <Menu.Item component={Link} href="/dashboard/tours" icon={<IconBottle size={14} stroke={1.5} />}>
+                        Your Tours
+                    </Menu.Item>
+                    <Menu.Item component={Link} href="/dashboard/bookings" icon={<IconCalendarEvent size={14} stroke={1.5} />}>
+                        Bookings
+                    </Menu.Item>
+                </> : null}
 
 
                 <Menu.Label>Settings</Menu.Label>
@@ -243,6 +270,7 @@ const RightSideSignedIn = () => {
 
 const RightSideSignedOut = () => {
     const session = useSession()
+
     return (
         session.status === "loading" ? <Loader size={30} /> : <Button size='md' component={Link} href="/login" radius="xl" sx={{ height: 30 }}>
             Log In

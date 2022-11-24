@@ -25,6 +25,7 @@ interface ArticleCardFooterProps {
     category: string;
     title: string;
     footer: string;
+    id: string;
     author: {
         name: string;
         description: string;
@@ -35,6 +36,7 @@ interface ArticleCardFooterProps {
 export function GuideCard({
     image,
     category,
+    id,
     title,
     footer,
     author,
@@ -66,7 +68,7 @@ export function GuideCard({
             <Card.Section className={classes.footer}>
                 <Group position="apart">
 
-                    <Button href={"/guides/" + author.name} component={Link} fullWidth>
+                    <Button href={"/guides/" + id} component={Link} fullWidth>
                         Check Out Tours
 
                     </Button>

@@ -1,3 +1,4 @@
+import { PrismaAdapter } from '@next-auth/prisma-adapter';
 import NextAuth, { type NextAuthOptions } from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import bcrypt from "bcrypt";
@@ -5,27 +6,33 @@ import bcrypt from "bcrypt";
 import { env } from "../../../env/server.mjs";
 import { prisma } from "../../../server/db/client";
 import { ILogin, loginSchema } from "@/validation/auth";
+import { User } from '@prisma/client';
 
 
 export const authOptions: NextAuthOptions = {
   callbacks: {
-    jwt: async ({ token, user }) => {
+    async jwt({ token, user, account }) {
       if (user) {
         token.id = user.id;
         token.email = user.email;
+        token.user_type = (user as User).user_type;
       }
 
       return token;
     },
-    session({ session, token, user }) {
+    async session({ session, token, user }) {
       if (token && session.user) {
-        session.user.id = parseInt(token.id as string);
-
+        session.user.id = token.id as string;
+        session.user.user_type = (token as any)?.user_type;
 
       }
-      console.log(user);
+
       return session;
     },
+  },
+  session: {
+    strategy: 'jwt',
+
   },
   secret: env.NEXTAUTH_SECRET,
   pages: {
@@ -33,7 +40,10 @@ export const authOptions: NextAuthOptions = {
     newUser: "/register",
     error: "/login",
   },
-
+  theme: {
+    logo: "/glass-full.svg",
+    colorScheme: "dark",
+  },
   providers: [
     Credentials({
       name: "credentials",
@@ -45,6 +55,8 @@ export const authOptions: NextAuthOptions = {
         },
         password: { label: "Password", type: "password" },
       },
+      type: 'credentials',
+      id: 'credentials',
       async authorize(credentials, req) {
         const cred: ILogin = await loginSchema.parseAsync(credentials);
 
@@ -66,11 +78,11 @@ export const authOptions: NextAuthOptions = {
         }
 
         return {
-          id: (user.id).toString(),
+          id: user.id,
           email: user.email,
           image: user.photo,
           name: user.name,
-
+          user_type: user.user_type,
         };
       },
     }),

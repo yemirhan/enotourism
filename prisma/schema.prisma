@@ -1,11 +1,16 @@
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
   previewFeatures = ["referentialIntegrity"]
 }
+
 datasource db {
-  provider = "mysql"
-  url = env("DATABASE_URL")
+  provider             = "mysql"
+  url                  = env("DATABASE_URL")
   referentialIntegrity = "prisma"
+}
+
+generator zod {
+  provider = "prisma-zod-generator"
 }
 
 enum UserType {
@@ -20,8 +25,72 @@ enum Gender {
   OTHER
 }
 
+enum CountryList {
+  Albania
+  Argentina
+  Armenia
+  Australia
+  Austria
+  Azerbaijan
+  Belgium
+  Bolivia
+  BosniaHerzegovina
+  Brazil
+  Bulgaria
+  Canada
+  Chile
+  China
+  Croatia
+  Cyprus
+  CzechRepublic
+  Denmark
+  Estonia
+  Finland
+  France
+  Georgia
+  Germany
+  Greece
+  Hungary
+  Israel
+  Italy
+  Kazakhstan
+  Latvia
+  Lebanon
+  Lithuania
+  Luxembourg
+  Malta
+  Mexico
+  Moldova
+  Montenegro
+  Morocco
+  Namibia
+  Netherlands
+  NewZealand
+  NorthernMacedonia
+  Peru
+  Poland
+  Portugal
+  Romania
+  Russia
+  Serbia
+  Slovakia
+  Slovenia
+  SouthAfrica
+  Spain
+  Sweden
+  Switzerland
+  Thailand
+  Turkey
+  Ukraine
+  UnitedKingdom
+  Uruguay
+  USA
+  Uzbekistan
+  Vietnam
+}
+
 model User {
-  id           Int              @id @default(autoincrement())
+  id           String           @id @default(cuid())
   email        String           @unique
   password     String
   name         String?
@@ -41,65 +110,65 @@ model User {
 }
 
 model Address {
-  id                 Int       @id @default(autoincrement())
+  id                 String       @id @default(cuid())
   street             String
   city               String
-  flat               String
+  flat               String?
   address            String
-  is_contact_address Boolean
-  postcode           String
-  country            Country[]
-  region             Region[]
-  user_id            Int       @unique
-  user               User      @relation(fields: [user_id], references: [id])
+  is_contact_address Boolean      @default(true)
+  postcode           String?
+  country            CountryList?
+  // region             Region[]
+  user_id            String       @unique
+  user               User         @relation(fields: [user_id], references: [id])
   Winery             Winery[]
 }
 
 model Country {
-  id          Int             @id @default(autoincrement())
+  id          String          @id @default(cuid())
   name        String
   photos      CountryPhotos[]
   description String
-  Address     Address?        @relation(fields: [addressId], references: [id])
-  addressId   Int?
+  //Address     Address?        @relation(fields: [addressId], references: [id])
+  //addressId   String?
 }
 
 model CountryPhotos {
-  id        Int     @id @default(autoincrement())
-  countryId Int
+  id        String  @id @default(cuid())
+  countryId String
   country   Country @relation(fields: [countryId], references: [id])
   url       String
 }
 
 model RegionPhotos {
-  id       Int    @id @default(autoincrement())
-  regionId Int
+  id       String @id @default(cuid())
+  regionId String
   region   Region @relation(fields: [regionId], references: [id])
   url      String
 }
 
 model Region {
-  id          Int            @id @default(autoincrement())
+  id          String         @id @default(cuid())
   name        String
   photos      RegionPhotos[]
   description String
-  Address     Address?       @relation(fields: [addressId], references: [id])
-  addressId   Int?
+  // Address     Address?       @relation(fields: [addressId], references: [id])
+  // addressId   String?
 }
 
 model Winery {
-  id           Int            @id @default(autoincrement())
+  id           String         @id @default(cuid())
   name         String
   description  String
   photos       WineryPhotos[]
   address      Address?       @relation(fields: [addressId], references: [id])
-  addressId    Int?
+  addressId    String?
   email        String
   history      String
   awards       String
   language     Language[]
   owner        User           @relation(fields: [userId], references: [id])
-  userId       Int
+  userId       String
   WorkingHours WorkingHours[]
   Tour         Tour[]
   Wine         Wine[]
@@ -107,52 +176,52 @@ model Winery {
 }
 
 model WineryPhotos {
-  id       Int    @id @default(autoincrement())
-  wineryId Int
+  id       String @id @default(cuid())
+  wineryId String
   winery   Winery @relation(fields: [wineryId], references: [id])
   url      String
 }
 
 model Language {
-  id       Int     @id @default(autoincrement())
+  id       String  @id @default(cuid())
   name     String
   flag     String
   Winery   Winery? @relation(fields: [wineryId], references: [id])
-  wineryId Int?
+  wineryId String?
 }
 
 model WorkingHours {
-  id       Int     @id @default(autoincrement())
+  id       String  @id @default(cuid())
   day      String
   open     String
   close    String
   Winery   Winery? @relation(fields: [wineryId], references: [id])
-  wineryId Int?
+  wineryId String?
 }
 
 model Tour {
-  id               Int    @id @default(autoincrement())
+  id               String  @id @default(cuid())
   name             String
   description      String
   number_of_people Int
-  Winery           Winery @relation(fields: [wineryId], references: [id])
-  wineryId         Int
-  tour_guide       User   @relation(fields: [userId], references: [id])
-  userId           Int
+  Winery           Winery? @relation(fields: [wineryId], references: [id])
+  wineryId         String?
+  tour_guide       User    @relation(fields: [userId], references: [id])
+  userId           String
 }
 
 model Wine {
-  id                Int      @id @default(autoincrement())
+  id                String   @id @default(cuid())
   name              String
   brief_description String
   wine_type         WineType @relation(fields: [wineTypeId], references: [id])
   Winery            Winery   @relation(fields: [wineryId], references: [id])
-  wineryId          Int
-  wineTypeId        Int
+  wineryId          String
+  wineTypeId        String
 }
 
 model WineType {
-  id      Int    @id @default(autoincrement())
+  id      String @id @default(cuid())
   name    String
   color   String
   taste   String
@@ -162,7 +231,7 @@ model WineType {
 }
 
 model Offer {
-  id                   Int             @id @default(autoincrement())
+  id                   String          @id @default(cuid())
   name                 String
   description          String
   price                Int
@@ -173,31 +242,31 @@ model Offer {
   photos               OfferPhoto[]
   max_number_of_people Int
   duration             Int
-  wineryId             Int
+  wineryId             String
   OfferTimeSlot        OfferTimeSlot[]
   Reservation          Reservation[]
 }
 
 model OfferPhoto {
-  id      Int    @id @default(autoincrement())
-  offerId Int
+  id      String @id @default(cuid())
+  offerId String
   offer   Offer  @relation(fields: [offerId], references: [id])
   url     String
 }
 
 model OfferType {
-  id      Int    @id @default(autoincrement())
+  id      String @id @default(cuid())
   name    String
   offers  Offer  @relation(fields: [offerId], references: [id])
-  offerId Int
+  offerId String
 }
 
 model OfferTimeSlot {
-  id        Int      @id @default(autoincrement())
+  id        String   @id @default(cuid())
   date      DateTime
   startTime Int
   endTime   Int
-  offerId   Int
+  offerId   String
   offer     Offer    @relation(fields: [offerId], references: [id])
 }
 
@@ -219,33 +288,33 @@ enum Days {
 }
 
 model GuideTimeSlots {
-  id        Int  @id @default(autoincrement())
+  id        String @id @default(cuid())
   date      Days
   startTime Int
   endTime   Int
-  guideId   Int
-  guide     User @relation(fields: [guideId], references: [id])
+  guideId   String
+  guide     User   @relation(fields: [guideId], references: [id])
 }
 
 model Status {
-  id     Int        @id @default(autoincrement())
+  id     String     @id @default(cuid())
   status StatusType @default(PENDING)
 
   Reservation Reservation[]
 }
 
 model Reservation {
-  id               Int      @id @default(autoincrement())
+  id               String   @id @default(cuid())
   date             DateTime
   from_time        Int
   to_time          Int
   slug             String
   number_of_people Int
   number_of_kids   Int
-  offerId          Int
+  offerId          String
   offer            Offer    @relation(fields: [offerId], references: [id])
-  statusId         Int
+  statusId         String
   status           Status   @relation(fields: [statusId], references: [id])
-  userId           Int
+  userId           String
   user             User     @relation(fields: [userId], references: [id])
 }

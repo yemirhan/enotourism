@@ -11,22 +11,31 @@ import {
     IconBarrel,
     IconBottle
 } from '@tabler/icons';
+import { useSession } from 'next-auth/react';
 import { LinksGroup } from './LinksGroup';
 
 
+const profile = {
+    label: 'Profile',
+    icon: IconUser,
+    initiallyOpened: true,
+    links: [
+        { label: 'Your Profile', link: '/dashboard/profile' },
+        { label: 'Update Profile', link: '/dashboard/update_profile' },
+        { label: 'Address Details', link: '/dashboard/address' },
+    ],
+}
 
-
-
-const mockdata = [
+const userLinks = [
+    profile,
     {
-        label: 'Profile',
-        icon: IconUser,
-        initiallyOpened: true,
-        links: [
-            { label: 'Your Profile', link: '/dashboard/profile' },
-            { label: 'Update Profile', link: '/dashboard/update_profile' },
-        ],
-    },
+        label: "Bookings",
+        icon: IconCalendarStats,
+        link: '/dashboard/bookings',
+    }
+]
+const wineryLinks = [
+    profile,
     {
         label: 'Winery',
         icon: IconBarrel,
@@ -36,6 +45,17 @@ const mockdata = [
         ],
     },
     {
+        label: "Your Wines",
+        icon: IconBottle,
+        link: "/dashboard/your_wines"
+    },
+
+
+];
+
+const tourGuideLinks = [
+    profile,
+    {
         label: 'Tours',
         icon: IconBottle,
         links: [
@@ -43,9 +63,6 @@ const mockdata = [
             { label: 'Create Tour', link: '/dashboard/create_tour' },
         ],
     },
-    { label: 'Analytics', icon: IconPresentationAnalytics },
-    { label: 'Contracts', icon: IconFileAnalytics },
-    { label: 'Settings', icon: IconAdjustments },
 
 ];
 
@@ -85,7 +102,13 @@ const useStyles = createStyles((theme) => ({
 
 export function Navigation() {
     const { classes } = useStyles();
-    const links = mockdata.map((item) => <LinksGroup {...item} key={item.label} />);
+    const session = useSession()
+
+    const links = ({
+        "TASTER": userLinks,
+        "WINERY": wineryLinks,
+        "GUIDE": tourGuideLinks
+    }[session.data?.user?.user_type || "TASTER"] || []).map((item) => <LinksGroup {...item} key={item.label} />);
 
     return (
         <Navbar height={"full"} width={{ sm: 300 }} p="md" className={classes.navbar}>

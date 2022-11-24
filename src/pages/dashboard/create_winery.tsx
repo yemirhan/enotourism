@@ -30,6 +30,10 @@ const CreateWinery = () => {
             history: "",
             awards: ""
         },
+        validate: {
+            email: (val) => (/^\S+@\S+$/.test(val) ? null : 'Invalid email'),
+            name: (val) => (val.length <= 6 ? 'Name should include at least 6 characters' : null),
+        }
     });
     return (
         <Layout>
@@ -52,6 +56,7 @@ const CreateWinery = () => {
                                     placeholder='Winery Name'
                                     required
                                     value={form.values.name}
+                                    {...form.getInputProps('name')}
                                     onChange={(event) => form.setFieldValue('name', event.currentTarget.value)}
                                 />
                             </Grid.Col>
@@ -61,6 +66,8 @@ const CreateWinery = () => {
                                     placeholder='E-Mail'
                                     required
                                     value={form.values.email}
+                                    {...form.getInputProps('email')}
+
                                     onChange={(event) => form.setFieldValue('email', event.currentTarget.value)}
                                 />
                             </Grid.Col>

@@ -1,5 +1,7 @@
 import Layout from "@/components/layout/Layout";
 import { ProfileCard } from "@/components/profile/ProfileCard";
+import YourTours from "@/components/profile/Tours";
+import YourWineries from "@/components/profile/Wineries";
 import { trpc } from "@/utils/trpc";
 import { UserGender } from "@/validation/auth";
 import { Button, Container, Grid, Group, SegmentedControl, Stack, Text, Textarea, TextInput, Title, useMantineTheme } from "@mantine/core"
@@ -17,7 +19,7 @@ export type UpdateProfile = {
     about: string
 }
 const Profile = () => {
-    
+    const session = useSession()
 
     return (
         <Layout>
@@ -27,7 +29,11 @@ const Profile = () => {
                         Your Profile
                     </Title>
                     <ProfileCard />
-
+                    {session.data?.user?.user_type === "WINERY" && <YourWineries />}
+                    {session.data?.user?.user_type === "GUIDE" && <YourTours />}
+                    <Title order={3}>
+                        Reviews
+                    </Title>
                 </Stack>
             </Container>
         </Layout>

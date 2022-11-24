@@ -8,6 +8,7 @@ import { useForm } from "@mantine/form";
 import { showNotification } from "@mantine/notifications";
 import { IconPhoto, IconUpload, IconX } from "@tabler/icons";
 import { useSession } from "next-auth/react";
+import { useEffect } from "react";
 
 export type UpdateProfile = {
     name: string,
@@ -18,11 +19,13 @@ export type UpdateProfile = {
     about: string
 }
 const UpdateProfile = () => {
-    const { data } = useSession()
     const { data: user, isLoading: isUserLoading, refetch } = trpc.profile.getProfile.useQuery()
     const { mutate, isLoading } = trpc.profile.updateProfile.useMutation({
         onSuccess: () => {
-            refetch()
+            showNotification({
+                title: "Success",
+                message: "Profile updated successfully",
+            })
         },
         onError: () => {
             showNotification({
@@ -36,16 +39,25 @@ const UpdateProfile = () => {
     const theme = useMantineTheme();
     const form = useForm<UpdateProfile>({
         initialValues: {
+            name: "",
+            surname: "",
+            gender: "OTHER",
+            phone_number: "",
+            about: "",
+            photo: ""
+        },
+    });
+    useEffect(() => {
+        form.setValues({
             name: user?.name || "",
             surname: user?.surname || "",
             gender: user?.gender || "OTHER",
             phone_number: user?.phone_number || "",
             about: user?.about || "",
             photo: user?.photo || ""
-        },
-        
+        })
+    }, [user])
 
-    });
     if (isUserLoading) return <div>Loading...</div>
     return (
         <Layout>

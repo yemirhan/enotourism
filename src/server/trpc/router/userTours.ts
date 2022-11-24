@@ -1,7 +1,7 @@
-import { createWinerySchema } from "@/validation/auth";
 import { z } from "zod";
+import { TourCreateInputObjectSchema } from "../../../../prisma/generated/schemas/objects/TourCreateInput.schema";
 
-import { router, publicProcedure, protectedProcedure } from "../trpc";
+import { router, protectedProcedure } from "../trpc";
 
 export const userToursRoutes = router({
   getToursOfUser: protectedProcedure
@@ -27,4 +27,25 @@ export const userToursRoutes = router({
       });
       return tours;
     }),
+  getToursOfTourGuide: protectedProcedure.query(async ({ ctx }) => {
+    const tours = await ctx.prisma.tour.findMany({
+      where: {
+        userId: ctx.session.user.id,
+      }
+    });
+    return tours;
+  }),
+  createTour: protectedProcedure.input(z.object({
+    name: z.string(),
+    description: z.string(),
+    number_of_people: z.number(),
+  })).mutation(async ({ input, ctx }) => {
+    const tour = await ctx.prisma.tour.create({
+      data: {
+        ...input,
+        userId: ctx.session.user.id,
+      }
+    });
+    return tour;
+  })
 });

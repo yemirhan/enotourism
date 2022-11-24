@@ -6,6 +6,7 @@ import { guideRouter } from "./guides";
 import { userWineryRoutes } from "./userWinery";
 import { wineriesRouter } from "./wineries";
 import { userToursRoutes } from "./userTours";
+import { addressRoutes } from "./userAddress";
 
 export const appRouter = router({
   protected: protectedRouter,
@@ -14,7 +15,9 @@ export const appRouter = router({
   guides: guideRouter,
   userWinery: userWineryRoutes,
   wineries: wineriesRouter,
-  userTours: userToursRoutes
+  userTours: userToursRoutes,
+  address: addressRoutes,
+  
 });
 
 // export type definition of API
