@@ -10,31 +10,31 @@ import React from 'react'
 
 
 const CreateWinery = () => {
-    const router = useRouter()
-    const { mutate, isLoading } = trpc.userWinery.createWinery.useMutation({
-        onError: () => {
-            showNotification({
-                title: "Error",
-                message: "Something went wrong",
-            })
-        },
-        onSuccess: () => {
-            router.push("/dashboard/your_wineries")
-        }
-    })
-    const form = useForm<ICreateWinery>({
-        initialValues: {
-            name: "",
-            description: "",
-            email: "",
-            history: "",
-            awards: ""
-        },
-        validate: {
-            email: (val) => (/^\S+@\S+$/.test(val) ? null : 'Invalid email'),
-            name: (val) => (val.length <= 6 ? 'Name should include at least 6 characters' : null),
-        }
-    });
+    // const router = useRouter()
+    // const { mutate, isLoading } = trpc.userWinery.createWinery.useMutation({
+    //     onError: () => {
+    //         showNotification({
+    //             title: "Error",
+    //             message: "Something went wrong",
+    //         })
+    //     },
+    //     onSuccess: () => {
+    //         router.push("/dashboard/your_wineries")
+    //     }
+    // })
+    // const form = useForm<ICreateWinery>({
+    //     initialValues: {
+    //         name: "",
+    //         description: "",
+    //         email: "",
+    //         history: "",
+    //         awards: ""
+    //     },
+    //     validate: {
+    //         email: (val) => (/^\S+@\S+$/.test(val) ? null : 'Invalid email'),
+    //         name: (val) => (val.length <= 6 ? 'Name should include at least 6 characters' : null),
+    //     }
+    // });
     return (
         <Layout>
             <Container>
@@ -44,7 +44,7 @@ const CreateWinery = () => {
                             Create Winery
                         </Title>
                     </Group>
-                    <form onSubmit={form.onSubmit(() => {
+                    {/* <form onSubmit={form.onSubmit(() => {
                         mutate({
                             ...form.values
                         })
@@ -113,7 +113,7 @@ const CreateWinery = () => {
                                 Create Winery
                             </Button>
                         </Group>
-                    </form>
+                    </form> */}
                 </Stack>
             </Container>
         </Layout>

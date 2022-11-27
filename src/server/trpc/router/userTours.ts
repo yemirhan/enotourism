@@ -1,6 +1,4 @@
 import { z } from "zod";
-import { TourCreateInputObjectSchema } from "../../../../prisma/generated/schemas/objects/TourCreateInput.schema";
-
 import { router, protectedProcedure } from "../trpc";
 
 export const userToursRoutes = router({

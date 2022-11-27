@@ -2,20 +2,41 @@ import { z } from "zod";
 import { protectedProcedure, router } from "../trpc";
 
 
-const wineRouter = router({
+export const wineRouter = router({
   createWine: protectedProcedure.input(z.object({
     name: z.string(),
-    description: z.string(),
-    wineryId: z.string(),
+    brief_description: z.string(),
+    wine_type: z.object({
+      color: z.string(),
+      grapes: z.string(),
+      name: z.string(),
+      taste: z.string(),
+      texture: z.string(),
+    })
   })).mutation(async ({ input, ctx }) => {
     const wine = await ctx.prisma.wine.create({
       data: {
         name: input.name,
-        brief_description: input.description,
-        wineryId: input.wineryId,
-        wineTypeId: "1",
-      }
+        brief_description: input.brief_description,
+        wineryId: undefined,
+        color: input.wine_type.color,
+        grapes: input.wine_type.grapes,
+        taste: input.wine_type.taste,
+        texture: input.wine_type.texture,
+
+
+      },
+
     });
     return wine;
-  })
+  }),
+  getWines: protectedProcedure.query(async ({ ctx }) => {
+    const wines = await ctx.prisma.wine.findMany({
+      where: {
+        
+      }
+    });
+    return wines;
+  }),
+
 })

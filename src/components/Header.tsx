@@ -211,7 +211,8 @@ const RightSideSignedIn = () => {
     const { classes, theme, cx } = useStyles();
     const [userMenuOpened, setUserMenuOpened] = useState(false);
 
-
+    console.log(session.data?.user);
+    
     return (
         (session.status === "loading") ? <Loader size={30} /> : <Menu
             width={260}

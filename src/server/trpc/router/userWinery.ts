@@ -26,8 +26,21 @@ export const userWineryRoutes = router({
         email: input.email,
         history: input.history,
         name: input.name,
+        Wine: {
+          createMany: {
+            data: input.wines.map(wine => ({
+              name: wine.name,
+              brief_description: wine.brief_description,
+              color: wine.wine_type.color,
+              grapes: wine.wine_type.grapes,
+              taste: wine.wine_type.taste,
+              texture: wine.wine_type.texture,
+            })),
+          }
+        }
       }
     });
+
     return winery;
   })
 });
