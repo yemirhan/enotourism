@@ -154,7 +154,6 @@ export function Header({ links }: HeaderActionProps) {
                         <Link
                             href={link.link}
                             className={classes.link}
-                            onClick={() => console.log(classes.link)}
                         >
                             <Center>
                                 <span className={classes.linkLabel}>{link.label}</span>
@@ -210,8 +209,6 @@ const RightSideSignedIn = () => {
     const session = useSession()
     const { classes, theme, cx } = useStyles();
     const [userMenuOpened, setUserMenuOpened] = useState(false);
-
-    console.log(session.data?.user);
     
     return (
         (session.status === "loading") ? <Loader size={30} /> : <Menu

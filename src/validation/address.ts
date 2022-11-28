@@ -73,6 +73,6 @@ export const addressSchema = z.object({
   country: CountryListSchema.nullable(),
 });
 
-
+export type ICountryList = z.infer<typeof CountryListSchema>;
 
 export type IAddress = z.infer<typeof addressSchema>;

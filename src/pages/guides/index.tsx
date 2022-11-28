@@ -29,17 +29,14 @@ const Guides = () => {
                         {guides?.map((guide) => {
                             return <GuideCard key={guide.id}
                                 id={guide.id}
-                                category={guide.user_type}
-                                title={guide.name || ""}
-                                image={guide.photo || ""}
-                                footer={`tours`}
-                                author={
-                                    {
-                                        description: guide.about || "",
-                                        image: guide.photo || "",
-                                        name: guide.name || ""
-                                    }
-                                } />
+                                about={guide.about}
+                                email={guide.email}
+                                name={guide.name || ""}
+                                user_type={guide.user_type}
+                                address={guide.address}
+                                photo={guide.photo || ""}
+                                surname={guide.surname || ""}
+                            />
                         })}
                     </SimpleGrid>
                 </Stack>

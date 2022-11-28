@@ -1,4 +1,7 @@
+import { ICountryList } from '@/validation/address';
+import { UserType } from '@/validation/auth';
 import { createStyles, Card, Image, ActionIcon, Group, Text, Avatar, Badge, Button } from '@mantine/core';
+import { CountryList } from '@prisma/client';
 import { IconHeart, IconBookmark, IconShare } from '@tabler/icons';
 import Link from 'next/link';
 
@@ -21,46 +24,52 @@ const useStyles = createStyles((theme) => ({
 }));
 
 interface ArticleCardFooterProps {
-    image: string;
-    category: string;
-    title: string;
-    footer: string;
-    id: string;
-    author: {
-        name: string;
-        description: string;
-        image: string;
-    };
+    id: string,
+    about: string | null,
+    email: string,
+    name: string,
+    user_type: UserType,
+    surname: string,
+    photo: string,
+    address: {
+        address: string;
+        country: CountryList | null;
+        city: string;
+        street: string;
+    } | null
 }
 
 export function GuideCard({
-    image,
-    category,
     id,
-    title,
-    footer,
-    author,
+    about,
+    email,
+    name,
+    user_type,
+    surname,
+    photo,
+    address,
+
 }: ArticleCardFooterProps) {
     const { classes, theme } = useStyles();
 
     return (
         <Card withBorder p="lg" radius="md" className={classes.card}>
             <Card.Section mb="sm">
-                <Image src={author.image} alt={title} height={180} />
+                <Image src={photo} alt={name} height={180} />
             </Card.Section>
             <Group mt="lg" mb={"lg"}>
                 <div>
-                    <Text weight={500}>{author.name}</Text>
+                    <Text weight={500}>{name}</Text>
                     <Text size="xs" color="dimmed">
-                        {author.description}
+                        {address?.country || ""}
                     </Text>
                 </div>
             </Group>
 
-            <Badge>{category}</Badge>
+            <Badge>{user_type}</Badge>
 
             <Text weight={700} className={classes.title} mt="xs" lineClamp={3}>
-                {title}
+                {about}
             </Text>
 
 
@@ -69,7 +78,7 @@ export function GuideCard({
                 <Group position="apart">
 
                     <Button href={"/guides/" + id} component={Link} fullWidth>
-                        Check Out Tours
+                        Get Info About Guide
 
                     </Button>
                 </Group>
