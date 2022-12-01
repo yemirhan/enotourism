@@ -1,3 +1,4 @@
+import { WineTypes } from "@prisma/client";
 import z from "zod";
 
 export const loginSchema = z.object({
@@ -12,16 +13,17 @@ export const registerSchema = loginSchema.extend({
 const wines = z.object({
   name: z.string(),
   brief_description: z.string(),
+  
   wine_type: z.object({
     color: z.string(),
-    grapes: z.string(),
     name: z.string(),
     taste: z.string(),
-    texture: z.string(),
+    texture: z.nativeEnum(WineTypes),
   })
 })
 export const createWinerySchema = z.object({
   name: z.string(),
+  countryId: z.string(),
   description: z.string(),
   email: z.string(),
   history: z.string(),

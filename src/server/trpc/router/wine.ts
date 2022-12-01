@@ -1,3 +1,4 @@
+import { WineTypes } from "@prisma/client";
 import { z } from "zod";
 import { protectedProcedure, router } from "../trpc";
 
@@ -11,7 +12,7 @@ export const wineRouter = router({
       grapes: z.string(),
       name: z.string(),
       taste: z.string(),
-      texture: z.string(),
+      texture: z.nativeEnum(WineTypes),
     })
   })).mutation(async ({ input, ctx }) => {
     const wine = await ctx.prisma.wine.create({
@@ -20,7 +21,6 @@ export const wineRouter = router({
         brief_description: input.brief_description,
         wineryId: undefined,
         color: input.wine_type.color,
-        grapes: input.wine_type.grapes,
         taste: input.wine_type.taste,
         texture: input.wine_type.texture,
 

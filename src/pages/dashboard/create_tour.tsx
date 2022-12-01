@@ -1,10 +1,10 @@
 import ProtectedLayout from '@/components/layout/ProtectedLayout'
 import { trpc } from '@/utils/trpc'
-import { Button, Container, Grid, Group, NumberInput, Stack, Textarea, TextInput, Title } from '@mantine/core'
+import { Avatar, Button, Container, Grid, Group, NumberInput, Select, Stack, Text, Textarea, TextInput, Title } from '@mantine/core'
 import { useForm } from '@mantine/form'
 import { showNotification } from '@mantine/notifications'
 import { IconCheck, IconPlus } from '@tabler/icons'
-import React from 'react'
+import React, { forwardRef } from 'react'
 
 
 const CreateTour = () => {
@@ -17,14 +17,18 @@ const CreateTour = () => {
             })
         },
     })
+    const { data: wineries } = trpc.wineries.getWineries.useQuery()
     const form = useForm({
         initialValues: {
             name: "",
             description: "",
             number_of_people: 0,
+            wineryId: ""
         }
 
     })
+    console.log(form.values);
+
     return (
         <ProtectedLayout>
             <Container>
@@ -49,6 +53,31 @@ const CreateTour = () => {
                                 />
 
                             </Grid.Col>
+                            <Grid.Col span={6}>
+                                <Select
+                                    label='Winery'
+                                    placeholder='Winery'
+                                    required
+                                    itemComponent={SelectItem}
+                                    value={form.values.wineryId}
+                                    data={
+                                        (wineries || []).map(winery => {
+                                            return {
+                                                value: winery.id,
+                                                label: winery.name,
+                                                country: winery.address?.country,
+                                            }
+                                        })
+                                    }
+                                    searchable
+                                    filter={(value, item) =>
+                                        (item.label || "").toLowerCase().includes(value.toLowerCase().trim())
+                                    }
+                                    onChange={(event) => form.setFieldValue('wineryId', event || "")}
+                                />
+
+                            </Grid.Col>
+
                             <Grid.Col span={6}>
                                 <NumberInput
                                     label='Number of People'
@@ -87,3 +116,26 @@ const CreateTour = () => {
 }
 
 export default CreateTour
+
+
+interface ItemProps extends React.ComponentPropsWithoutRef<'div'> {
+    wineryId: string,
+    label: string,
+    country: string,
+}
+
+const SelectItem = forwardRef<HTMLDivElement, ItemProps>(
+    ({ label, country, ...others }: ItemProps, ref) => (
+        <div ref={ref} {...others}>
+            <Group noWrap>
+                <div>
+                    <Text size="sm">{label}</Text>
+                    <Text size="xs" opacity={0.65}>
+                        {country}
+                    </Text>
+                </div>
+            </Group>
+        </div>
+    )
+);
+SelectItem.displayName = '@mantine/core/SelectItem';

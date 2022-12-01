@@ -28,9 +28,10 @@ const useStyles = createStyles((theme) => ({
 }));
 
 interface BadgeCardProps {
-    image: string;
+    image: string | null;
     title: string;
     country: string;
+    id: string;
     description: string;
     badges: {
         emoji: string;
@@ -38,7 +39,7 @@ interface BadgeCardProps {
     }[];
 }
 
-export function TourCard({ image, title, description, country, badges }: BadgeCardProps) {
+export function TourCard({ image, title, description, id, country, badges }: BadgeCardProps) {
     const { classes, theme } = useStyles();
 
     const features = badges.map((badge) => (
@@ -69,13 +70,13 @@ export function TourCard({ image, title, description, country, badges }: BadgeCa
                 </Text>
             </Card.Section>
 
-            
+
 
             <Group mt="xs">
                 <Title order={3}>
                     49 €
                 </Title>
-                <Button component={Link} href={"/tours/" + title} fullWidth radius="md" style={{ flex: 1 }}>
+                <Button component={Link} href={"/tours/" + id} fullWidth radius="md" style={{ flex: 1 }}>
                     Book Now
                 </Button>
             </Group>

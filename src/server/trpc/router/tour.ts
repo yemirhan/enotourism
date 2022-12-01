@@ -4,7 +4,19 @@ import { router, publicProcedure } from './../trpc';
 
 export const tourRouter = router({
   getTours: publicProcedure.query(async ({ ctx }) => {
-    const tours = await ctx.prisma.tour.findMany({});
+    const tours = await ctx.prisma.tour.findMany({
+      include: {
+        Winery: {
+          include: {
+            country: {
+              select: {
+                name: true,
+              }
+            }
+          }
+        }
+      }
+    });
     return tours;
   }),
   getTourById: publicProcedure

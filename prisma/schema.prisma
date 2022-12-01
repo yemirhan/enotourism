@@ -21,6 +21,15 @@ enum Gender {
   OTHER
 }
 
+enum WineTypes {
+  HEAVY  @map("Heavy")
+  SILKY  @map("silky")
+  SHARP  @map("sharp")
+  BRIGHT @map("bright")
+  GRITTY @map("gritty")
+  SMOOTH @map("smooth")
+}
+
 enum CountryList {
   Albania
   Argentina
@@ -123,32 +132,28 @@ model Address {
 }
 
 model Country {
-  id          String          @id @default(cuid())
-  name        String
-  photos      CountryPhotos[]
-  description String
+  id      String   @id @default(cuid())
+  name    String
+  code    String
+  emoji   String
+  unicode String
+  image   String
   //Address     Address?        @relation(fields: [addressId], references: [id])
   //addressId   String?
+  Winery  Winery[]
 }
 
-model CountryPhotos {
-  id        String  @id @default(cuid())
-  countryId String
-  country   Country @relation(fields: [countryId], references: [id])
-  url       String
-}
-
-model RegionPhotos {
-  id       String @id @default(cuid())
-  regionId String
-  region   Region @relation(fields: [regionId], references: [id])
-  url      String
-}
+// model RegionPhotos {
+//   id       String @id @default(cuid())
+//   regionId String
+//   region   Region @relation(fields: [regionId], references: [id])
+//   url      String
+// }
 
 model Region {
-  id          String         @id @default(cuid())
-  name        String
-  photos      RegionPhotos[]
+  id   String @id @default(cuid())
+  name String
+
   description String
   // Address     Address?       @relation(fields: [addressId], references: [id])
   // addressId   String?
@@ -171,6 +176,12 @@ model Winery {
   Tour         Tour[]
   Wine         Wine[]
   Offer        Offer[]
+  country      Country        @relation(fields: [countryId], references: [id])
+  countryId    String 
+
+  @@index([countryId])
+  @@index([userId])
+  @@index([addressId])
 }
 
 model WineryPhotos {
@@ -178,6 +189,8 @@ model WineryPhotos {
   wineryId String
   winery   Winery @relation(fields: [wineryId], references: [id])
   url      String
+
+  @@index([wineryId])
 }
 
 model Language {
@@ -186,6 +199,8 @@ model Language {
   flag     String
   Winery   Winery? @relation(fields: [wineryId], references: [id])
   wineryId String?
+
+  @@index([wineryId])
 }
 
 model WorkingHours {
@@ -195,6 +210,8 @@ model WorkingHours {
   close    String
   Winery   Winery? @relation(fields: [wineryId], references: [id])
   wineryId String?
+
+  @@index([wineryId])
 }
 
 model Tour {
@@ -206,6 +223,9 @@ model Tour {
   wineryId         String?
   tour_guide       User    @relation(fields: [userId], references: [id])
   userId           String
+
+  @@index([wineryId])
+  @@index([userId])
 }
 
 model Wine {
@@ -214,10 +234,11 @@ model Wine {
   brief_description String
   color             String
   taste             String
-  grapes            String
-  texture           String
+  texture           WineTypes
   Winery            Winery? @relation(fields: [wineryId], references: [id])
   wineryId          String?
+
+  @@index([wineryId])
 }
 
 model Offer {

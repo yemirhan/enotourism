@@ -1,5 +1,6 @@
 import { useMediaQuery } from '@mantine/hooks';
 import { createStyles, Paper, Text, Title, Button, useMantineTheme } from '@mantine/core';
+import { Carousel } from '@mantine/carousel';
 
 const useStyles = createStyles((theme) => ({
   card: {
@@ -90,28 +91,28 @@ const data = [
 ];
 
 export function TourCarousel() {
-    return null
-//   const theme = useMantineTheme();
-//   const mobile = useMediaQuery(`(max-width: ${theme.breakpoints.sm}px)`);
-//   const slides = data.map((item) => (
-//     <Carousel.Slide size={"100%"}  key={item.title}>
-//       <Card {...item} />
-//     </Carousel.Slide>
-//   ));
+    
+  const theme = useMantineTheme();
+  const mobile = useMediaQuery(`(max-width: ${theme.breakpoints.sm}px)`);
+  const slides = data.map((item) => (
+    <Carousel.Slide size={"100%"}  key={item.title}>
+      <Card {...item} />
+    </Carousel.Slide>
+  ));
 
-//   return (
-//     <Carousel
-//       sx={{
-//         width: "100%"
-//       }}
-//       mx="auto"
-//       withIndicators
-//       withControls
-//       height={440}
-//       slideGap="md"
-//       align="start"
-//     >
-//       {slides}
-//     </Carousel>
-//   );
+  return (
+    <Carousel
+      sx={{
+        width: "100%"
+      }}
+      mx="auto"
+      withIndicators
+      withControls
+      height={440}
+      slideGap="md"
+      align="start"
+    >
+      {slides}
+    </Carousel>
+  );
 }

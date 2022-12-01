@@ -2,7 +2,7 @@ import Layout from '@/components/layout/Layout'
 import { WineryTable } from '@/components/userWineries/WineryTable'
 import { trpc } from '@/utils/trpc'
 import { ICreateWinery, IWine } from '@/validation/auth'
-import { Button, Container, Grid, Group, Loader, Modal, Paper, SegmentedControl, Stack, Stepper, Text, Textarea, TextInput, Title } from '@mantine/core'
+import { Button, Container, Grid, Group, Loader, Modal, Paper, SegmentedControl, Select, Stack, Stepper, Text, Textarea, TextInput, Title } from '@mantine/core'
 import { useForm } from '@mantine/form'
 import { useDisclosure } from '@mantine/hooks'
 import { showNotification } from '@mantine/notifications'
@@ -64,6 +64,7 @@ const AddWineryModal = ({ opened, close }: { opened: boolean, close: () => void 
 
         }
     })
+    const { data: countries } = trpc.countries.getCountries.useQuery()
     const [active, setActive] = useState(0);
     const nextStep = () => setActive((current) => (current < 2 ? current + 1 : current));
     const prevStep = () => setActive((current) => (current > 0 ? current - 1 : current));
@@ -71,6 +72,7 @@ const AddWineryModal = ({ opened, close }: { opened: boolean, close: () => void 
         initialValues: {
             name: "",
             description: "",
+            countryId: "",
             email: "",
             history: "",
             awards: "",
@@ -87,10 +89,9 @@ const AddWineryModal = ({ opened, close }: { opened: boolean, close: () => void 
             brief_description: "",
             wine_type: {
                 color: "red",
-                grapes: "",
                 name: "",
                 taste: "",
-                texture: "",
+                texture: "SMOOTH",
             }
         }
     })
@@ -106,7 +107,7 @@ const AddWineryModal = ({ opened, close }: { opened: boolean, close: () => void 
         <Stepper active={active} onStepClick={setActive} breakpoint="sm">
             <Stepper.Step label="First step" description="Enter Winery Details">
                 <Grid>
-                    <Grid.Col span={6}>
+                    <Grid.Col span={4}>
                         <TextInput
                             label='Winery Name'
                             placeholder='Winery Name'
@@ -116,7 +117,7 @@ const AddWineryModal = ({ opened, close }: { opened: boolean, close: () => void 
                             onChange={(event) => form.setFieldValue('name', event.currentTarget.value)}
                         />
                     </Grid.Col>
-                    <Grid.Col span={6}>
+                    <Grid.Col span={4}>
                         <TextInput
                             label='E-Mail'
                             placeholder='E-Mail'
@@ -125,6 +126,19 @@ const AddWineryModal = ({ opened, close }: { opened: boolean, close: () => void 
                             {...form.getInputProps('email')}
 
                             onChange={(event) => form.setFieldValue('email', event.currentTarget.value)}
+                        />
+                    </Grid.Col>
+                    <Grid.Col span={4}>
+                        <Select
+                            label='Country'
+                            placeholder='Country'
+                            required
+                            value={form.values.countryId}
+                            data={
+                                (countries || []).map(c => ({ value: c.id, label: c.name }))
+                            }
+
+                            onChange={(event) => form.setFieldValue('countryId', event || "")}
                         />
                     </Grid.Col>
                     <Grid.Col span={12}>
@@ -208,13 +222,6 @@ const AddWineryModal = ({ opened, close }: { opened: boolean, close: () => void 
                                     label='Wine Type Name'
                                     placeholder='Wine Type Name'
                                     {...wineForm.getInputProps('wine_type.name')}
-                                />
-                            </Grid.Col>
-                            <Grid.Col span={6}>
-                                <TextInput
-                                    label='Wine Type Grapes'
-                                    placeholder='Wine Type Grapes'
-                                    {...wineForm.getInputProps('wine_type.grapes')}
                                 />
                             </Grid.Col>
                             <Grid.Col span={6}>

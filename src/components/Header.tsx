@@ -144,7 +144,7 @@ export function Header({ links }: HeaderActionProps) {
     const router = useRouter();
     const items = links.map((link) => {
         const menuItems = link.links?.map((item) => (
-            <Menu.Item key={item.link}>{item.label}</Menu.Item>
+            <Menu.Item component={Link} href={item.link} key={item.link}>{item.label}</Menu.Item>
         ));
 
         if (menuItems) {
@@ -209,7 +209,7 @@ const RightSideSignedIn = () => {
     const session = useSession()
     const { classes, theme, cx } = useStyles();
     const [userMenuOpened, setUserMenuOpened] = useState(false);
-    
+
     return (
         (session.status === "loading") ? <Loader size={30} /> : <Menu
             width={260}

@@ -1,6 +1,7 @@
 import Layout from "@/components/layout/Layout"
 import { SearchBar } from "@/components/tours/SearchBar"
 import { TourCard } from "@/components/tours/TourCard"
+import { trpc } from "@/utils/trpc"
 import { Container, SimpleGrid, Stack, Text, Title } from "@mantine/core"
 
 
@@ -35,6 +36,7 @@ const data = {
     ]
 }
 const Tours = () => {
+    const { data: tours } = trpc.tour.getTours.useQuery()
     return (
         <Layout>
             <Container size={"xl"}>
@@ -48,10 +50,9 @@ const Tours = () => {
                     </Text>
                     <SearchBar />
                     <SimpleGrid cols={3}>
-                        <TourCard {...data} />
-                        <TourCard {...data} />
-                        <TourCard {...data} />
-                        <TourCard {...data} />
+                        {(tours || []).map(tour => {
+                            return <TourCard id={tour.id} key={tour.id} image={null} title={tour.name} description={tour.description} country={tour.Winery?.country.name || ""} badges={[]} />
+                        })}
 
                     </SimpleGrid>
                 </Stack>
