@@ -117,22 +117,26 @@ model User {
 }
 
 model Address {
-  id                 String       @id @default(cuid())
+  id                 String   @id @default(cuid())
   street             String
   city               String
   flat               String?
   address            String
-  is_contact_address Boolean      @default(true)
+  is_contact_address Boolean  @default(true)
   postcode           String?
-  country            CountryList?
+  country            Country  @relation(fields: [countryId], references: [id])
+  countryId          String
   // region             Region[]
-  user_id            String       @unique
-  user               User         @relation(fields: [user_id], references: [id])
+  user_id            String   @unique
+  user               User     @relation(fields: [user_id], references: [id])
   Winery             Winery[]
+
+  @@index([countryId], name: "countryId")
+
 }
 
 model Country {
-  id      String   @id @default(cuid())
+  id      String    @id @default(cuid())
   name    String
   code    String
   emoji   String
@@ -141,6 +145,7 @@ model Country {
   //Address     Address?        @relation(fields: [addressId], references: [id])
   //addressId   String?
   Winery  Winery[]
+  Address Address[]
 }
 
 // model RegionPhotos {
@@ -177,7 +182,7 @@ model Winery {
   Wine         Wine[]
   Offer        Offer[]
   country      Country        @relation(fields: [countryId], references: [id])
-  countryId    String 
+  countryId    String
 
   @@index([countryId])
   @@index([userId])
@@ -229,13 +234,13 @@ model Tour {
 }
 
 model Wine {
-  id                String  @id @default(cuid())
+  id                String    @id @default(cuid())
   name              String
   brief_description String
   color             String
   taste             String
   texture           WineTypes
-  Winery            Winery? @relation(fields: [wineryId], references: [id])
+  Winery            Winery?   @relation(fields: [wineryId], references: [id])
   wineryId          String?
 
   @@index([wineryId])

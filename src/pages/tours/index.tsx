@@ -3,6 +3,7 @@ import { SearchBar } from "@/components/tours/SearchBar"
 import { TourCard } from "@/components/tours/TourCard"
 import { trpc } from "@/utils/trpc"
 import { Container, SimpleGrid, Stack, Text, Title } from "@mantine/core"
+import { useState } from "react"
 
 
 
@@ -36,7 +37,13 @@ const data = {
     ]
 }
 const Tours = () => {
-    const { data: tours } = trpc.tour.getTours.useQuery()
+
+    const [search, setSearch] = useState("")
+    const [countryIds, setCountryIds] = useState<string[]>([])
+    const { data: tours } = trpc.tour.searchTours.useQuery({
+        name: search,
+        countryId: countryIds
+    })
     return (
         <Layout>
             <Container size={"xl"}>
@@ -48,7 +55,7 @@ const Tours = () => {
                         Just getting started on your wine journey, or jumping back in?
                         Taste through a selection of a great local wines.
                     </Text>
-                    <SearchBar />
+                    <SearchBar search={search} setSearch={setSearch} countryIds={countryIds} setCountryIds={setCountryIds} />
                     <SimpleGrid cols={3}>
                         {(tours || []).map(tour => {
                             return <TourCard id={tour.id} key={tour.id} image={null} title={tour.name} description={tour.description} country={tour.Winery?.country.name || ""} badges={[]} />

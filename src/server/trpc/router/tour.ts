@@ -19,6 +19,40 @@ export const tourRouter = router({
     });
     return tours;
   }),
+  searchTours: publicProcedure.input(z.object({
+    name: z.string(),
+    countryId: z.array(z.string()),
+  })).query(async ({ ctx, input }) => {
+    return await ctx.prisma.tour.findMany({
+      where: {
+        AND: [
+          {
+            name: {
+              contains: input.name,
+            }
+          },
+          input.countryId.length > 0 ? {
+            Winery: {
+              countryId: {
+                in: input.countryId
+              }
+            }
+          } : {}
+        ]
+      },
+      include: {
+        Winery: {
+          include: {
+            country: {
+              select: {
+                name: true,
+              }
+            }
+          }
+        }
+      }
+    });
+  }),
   getTourById: publicProcedure
     .input(z.object({
       id: z.string(),
@@ -66,21 +100,4 @@ export const tourRouter = router({
       });
       return tour;
     }),
-  searchTours: publicProcedure
-    .input(z.object({
-      name: z.string(),
-    }))
-    .query(async ({ ctx, input }) => {
-      const tours = await ctx.prisma.tour.findMany({
-        where: {
-          name: {
-            contains: input.name,
-          }
-        }
-      });
-      return tours;
-    }),
-
-
-
 })

@@ -70,7 +70,7 @@ export const addressSchema = z.object({
   address: z.string(),
   is_contact_address: z.boolean(),
   postcode: z.string().optional().nullable(),
-  country: CountryListSchema.nullable(),
+  countryId: z.string(),
 });
 
 export type ICountryList = z.infer<typeof CountryListSchema>;

@@ -1,3 +1,4 @@
+import { trpc } from '@/utils/trpc';
 import { Button, Group, MultiSelect, Paper, TextInput } from '@mantine/core'
 import { IconActivity, IconMapPin, IconSearch } from '@tabler/icons'
 import React from 'react'
@@ -72,14 +73,27 @@ const data2 = [
     { value: 'restaurant', label: 'Restaurant' },
 ];
 
-export const SearchBar = () => {
+export const SearchBar = ({
+    search,
+    setSearch,
+    countryIds,
+    setCountryIds
+}: {
+    search: string;
+    setSearch: (search: string) => void;
+    countryIds: string[];
+    setCountryIds: (countryIds: string[]) => void;
+}) => {
+    const { data: countries } = trpc.countries.getCountries.useQuery()
     return (
         <Paper withBorder p={"md"} >
             <Group grow spacing={"lg"}>
-                <TextInput placeholder='Where do you want to go?' icon={<IconSearch size={18} />} />
+                <TextInput value={search} onChange={(e) => setSearch(e.target.value)} placeholder='Where do you want to go?' icon={<IconSearch size={18} />} />
                 <MultiSelect
-                    data={data}
+                    data={(countries || []).map(country => ({ value: country.id, label: country.name }))}
                     icon={<IconMapPin size={18} />}
+                    value={countryIds}
+                    onChange={(c) => setCountryIds(c)}
                     placeholder="Location"
                 />
                 <MultiSelect

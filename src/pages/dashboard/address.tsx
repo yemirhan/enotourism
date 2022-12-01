@@ -4,7 +4,7 @@ import type { IAddress } from '@/validation/address';
 import { Button, Checkbox, Container, Grid, Group, Select, Stack, Textarea, TextInput, Title } from '@mantine/core'
 import { useForm } from '@mantine/form';
 import { showNotification } from '@mantine/notifications';
-import { CountryList } from '@prisma/client';
+
 import { IconCheck, IconDeviceFloppy, IconExclamationMark } from '@tabler/icons';
 import React, { useEffect, useState } from 'react'
 
@@ -36,7 +36,7 @@ const Address = () => {
             address: "",
             is_contact_address: false,
             postcode: "",
-            country: "Poland",
+            countryId: "",
         },
     });
     useEffect(() => {
@@ -119,10 +119,10 @@ const Address = () => {
 
                                     nothingFound="No countries found"
                                     required
-                                    value={form.values.country}
-                                    data={(Object.keys(CountryList)).map(country => ({ label: country, value: country }))}
+                                    value={form.values.countryId}
+                                    data={(countries || []).map(country => ({ value: country.id, label: country.name }))}
                                     {...form.getInputProps('country')}
-                                    onChange={(event: any) => form.setFieldValue('country', event)}
+                                    onChange={(event) => form.setFieldValue('countryId', event || "")}
                                 />
                             </Grid.Col>
                         </Grid>
