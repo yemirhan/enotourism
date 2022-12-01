@@ -1,5 +1,5 @@
 import ProtectedLayout from '@/components/layout/ProtectedLayout';
-import { CreateWineModal } from '@/components/wine/CreateWineModal';
+
 import { Button, Container, Group, Stack, Title } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import React from 'react'
@@ -21,7 +21,6 @@ export const YourWines = () => {
                 </Stack>
             </Container>
         </ProtectedLayout>
-        <CreateWineModal opened={opened} setClosed={close} />
     </>
     )
 }

@@ -10,6 +10,7 @@ import React, { useEffect, useState } from 'react'
 
 const Address = () => {
     const { data: address } = trpc.address.getAddress.useQuery();
+    const { data: countries } = trpc.countries.getCountries.useQuery()
     const { mutate, isLoading } = trpc.address.createOrUpdateAddress.useMutation({
         onError(error, variables, context) {
             showNotification({
