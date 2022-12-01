@@ -91,7 +91,7 @@ const Guide = () => {
                         <Paper radius="md" p="xl" withBorder>
                             <Stack spacing={"sm"}>
                                 <Text>FROM</Text>
-                                <Title>{data?.address?.country}</Title>
+                                <Title>{data?.address?.country.name}</Title>
 
                             </Stack>
                         </Paper>
