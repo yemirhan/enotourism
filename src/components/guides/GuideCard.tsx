@@ -1,7 +1,6 @@
 import { ICountryList } from '@/validation/address';
 import { UserType } from '@/validation/auth';
 import { createStyles, Card, Image, ActionIcon, Group, Text, Avatar, Badge, Button } from '@mantine/core';
-import { CountryList } from '@prisma/client';
 import { IconHeart, IconBookmark, IconShare } from '@tabler/icons';
 import Link from 'next/link';
 
@@ -33,7 +32,7 @@ interface ArticleCardFooterProps {
     photo: string,
     address: {
         address: string;
-        country: CountryList | null;
+        country: any;
         city: string;
         street: string;
     } | null
