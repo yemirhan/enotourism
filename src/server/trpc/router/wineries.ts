@@ -30,6 +30,7 @@ export const wineriesRouter = router({
           input.countryId ? {
             countryId: input.countryId
           } : {}
+
         ]
 
       },
