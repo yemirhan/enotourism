@@ -1,5 +1,6 @@
 import Layout from "@/components/layout/Layout";
 import { ProfileCard } from "@/components/profile/ProfileCard";
+import { supabase } from "@/utils/supabaseClient";
 import { trpc } from "@/utils/trpc";
 import { UserGender } from "@/validation/auth";
 import { Button, Container, Grid, Group, SegmentedControl, Stack, Text, Textarea, TextInput, Title, useMantineTheme } from "@mantine/core"
@@ -116,7 +117,28 @@ const UpdateProfile = () => {
 
                             <Grid.Col span={6}>
                                 <Dropzone
-                                    onDrop={(files) => console.log('accepted files', files)}
+                                    onDrop={async (files) => {
+                                        // const f = await files?.[0]?.arrayBuffer()
+
+                                        // if (f) {
+                                        //     supabase.storage.from("profile").upload(`profile-${user?.id}.png`, f, {
+                                                
+                                        //     }).then(({ data, error }) => {
+                                        //         if (error) {
+                                        //             showNotification({
+                                        //                 title: "Error",
+                                        //                 message: "Something went wrong",
+                                        //             })
+                                        //         } else {
+                                        //             showNotification({
+                                        //                 title: "Success",
+                                        //                 message: "Profile photo updated successfully",
+                                        //             })
+                                        //             refetch()
+                                        //         }
+                                        //     })
+                                        // }
+                                    }}
                                     onReject={(files) => console.log('rejected files', files)}
                                     maxSize={3 * 1024 ** 2}
                                     accept={IMAGE_MIME_TYPE}

@@ -132,7 +132,6 @@ model Address {
   Winery             Winery[]
 
   @@index([countryId], name: "countryId")
-
 }
 
 model Country {
@@ -226,11 +225,14 @@ model Tour {
   number_of_people Int
   Winery           Winery? @relation(fields: [wineryId], references: [id])
   wineryId         String?
-  tour_guide       User    @relation(fields: [userId], references: [id])
-  userId           String
+  tour_guide       User    @relation(fields: [tourGuideId], references: [id])
+  tourGuideId           String
+  offer            Offer   @relation(fields: [offerId], references: [id])
+  offerId          String
 
   @@index([wineryId])
-  @@index([userId])
+  @@index([tourGuideId])
+  @@index([offerId])
 }
 
 model Wine {
@@ -243,7 +245,7 @@ model Wine {
   Winery            Winery?   @relation(fields: [wineryId], references: [id])
   wineryId          String?
 
-  @@index([wineryId])
+  
 }
 
 model Offer {
@@ -251,16 +253,19 @@ model Offer {
   name                 String
   description          String
   price                Int
-  winery               Winery          @relation(fields: [wineryId], references: [id])
+  winery               Winery?          @relation(fields: [wineryId], references: [id])
   offer_types          OfferType[]
   adult_price          Decimal
   kid_price            Decimal
   photos               OfferPhoto[]
   max_number_of_people Int
   duration             Int
-  wineryId             String
+  wineryId             String?
   OfferTimeSlot        OfferTimeSlot[]
   Reservation          Reservation[]
+  Tour                 Tour[]
+
+  
 }
 
 model OfferPhoto {
@@ -268,22 +273,35 @@ model OfferPhoto {
   offerId String
   offer   Offer  @relation(fields: [offerId], references: [id])
   url     String
+
+  @@index([offerId])
+}
+
+enum OfferTypeEnum {
+  TASTING         @map("Visit and Tasting")
+  GUIDES          @map("Wine Guides")
+  EXTRAACTIVITIES @map("Extra Activities")
+  ACCOMODATION    @map("Accomodation")
+  RESTAURANT      @map("Restaurant")
 }
 
 model OfferType {
-  id      String @id @default(cuid())
-  name    String
-  offers  Offer  @relation(fields: [offerId], references: [id])
+  id      String        @id @default(cuid())
+  name    OfferTypeEnum
+  offers  Offer         @relation(fields: [offerId], references: [id])
   offerId String
+
+  @@index([offerId])
 }
 
 model OfferTimeSlot {
   id        String   @id @default(cuid())
-  date      DateTime
-  startTime Int
-  endTime   Int
+  startDate DateTime
+  endDate   DateTime
   offerId   String
   offer     Offer    @relation(fields: [offerId], references: [id])
+
+  @@index([offerId])
 }
 
 enum StatusType {

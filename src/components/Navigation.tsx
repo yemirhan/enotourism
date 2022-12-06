@@ -9,7 +9,8 @@ import {
     IconLock,
     IconUser,
     IconBarrel,
-    IconBottle
+    IconBottle,
+    IconCalendarEvent
 } from '@tabler/icons';
 import { useSession } from 'next-auth/react';
 import { LinksGroup } from './LinksGroup';
@@ -32,6 +33,11 @@ const userLinks = [
         label: "Bookings",
         icon: IconCalendarStats,
         link: '/dashboard/bookings',
+    },
+    {
+        label: "Reservations",
+        icon: IconCalendarEvent,
+        link: '/dashboard/reservations',
     }
 ]
 const wineryLinks = [
@@ -49,8 +55,11 @@ const wineryLinks = [
         icon: IconBottle,
         link: "/dashboard/your_wines"
     },
-
-
+    {
+        label: "Bookings",
+        icon: IconCalendarStats,
+        link: '/dashboard/bookings',
+    }
 ];
 
 const tourGuideLinks = [
@@ -63,6 +72,11 @@ const tourGuideLinks = [
             { label: 'Create Tour', link: '/dashboard/create_tour' },
         ],
     },
+    {
+        label: "Bookings",
+        icon: IconCalendarStats,
+        link: '/dashboard/bookings',
+    }
 
 ];
 

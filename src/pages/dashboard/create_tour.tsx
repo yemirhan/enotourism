@@ -1,13 +1,17 @@
 import ProtectedLayout from '@/components/layout/ProtectedLayout'
+import { CreateTourInput } from '@/server/trpc/router/userTours'
 import { trpc } from '@/utils/trpc'
-import { Avatar, Button, Container, Grid, Group, NumberInput, Select, Stack, Text, Textarea, TextInput, Title } from '@mantine/core'
+import { Avatar, Button, Container, Grid, Group, MultiSelect, NumberInput, Select, Stack, Text, Textarea, TextInput, Title, useMantineTheme } from '@mantine/core'
+import { Dropzone, IMAGE_MIME_TYPE } from '@mantine/dropzone'
 import { useForm } from '@mantine/form'
 import { showNotification } from '@mantine/notifications'
-import { IconCheck, IconPlus } from '@tabler/icons'
+import { OfferTypeEnum } from '@prisma/client'
+import { IconCheck, IconPhoto, IconPlus, IconUpload, IconX } from '@tabler/icons'
 import React, { forwardRef } from 'react'
 
 
 const CreateTour = () => {
+    const theme = useMantineTheme();
     const { mutate, isLoading } = trpc.userTours.createTour.useMutation({
         onSuccess() {
             showNotification({
@@ -18,12 +22,22 @@ const CreateTour = () => {
         },
     })
     const { data: wineries } = trpc.wineries.getWineries.useQuery()
-    const form = useForm({
+    const form = useForm<CreateTourInput>({
         initialValues: {
             name: "",
             description: "",
             number_of_people: 0,
-            wineryId: ""
+            wineryId: "",
+            adult_price: 0,
+            duration: 0,
+            kid_price: 0,
+            max_number_of_people: 0,
+            offer_description: "",
+            offer_name: "",
+            offerTypes: [],
+            price: 0,
+            endDate: new Date(),
+            startDate: new Date(),
         }
 
     })
@@ -42,6 +56,43 @@ const CreateTour = () => {
                         })
                     })}>
                         <Grid>
+                            <Grid.Col span={12}>
+                                <Dropzone
+                                    onDrop={(files) => console.log('accepted files', files)}
+                                    onReject={(files) => console.log('rejected files', files)}
+                                    maxSize={3 * 1024 ** 2}
+                                    accept={IMAGE_MIME_TYPE}
+                                >
+                                    <Group position="center" spacing="xl" style={{ minHeight: 220, pointerEvents: 'none' }}>
+                                        <Dropzone.Accept>
+                                            <IconUpload
+                                                size={50}
+                                                stroke={1.5}
+                                                color={theme?.colors?.[theme?.primaryColor]?.[theme.colorScheme === 'dark' ? 4 : 6]}
+                                            />
+                                        </Dropzone.Accept>
+                                        <Dropzone.Reject>
+                                            <IconX
+                                                size={50}
+                                                stroke={1.5}
+                                                color={theme.colors.red[theme.colorScheme === 'dark' ? 4 : 6]}
+                                            />
+                                        </Dropzone.Reject>
+                                        <Dropzone.Idle>
+                                            <IconPhoto size={50} stroke={1.5} />
+                                        </Dropzone.Idle>
+
+                                        <div>
+                                            <Text size="xl" inline>
+                                                Drag images here or click to select files
+                                            </Text>
+                                            <Text size="sm" color="dimmed" inline mt={7}>
+                                                Attach as many files as you like, each file should not exceed 5mb
+                                            </Text>
+                                        </div>
+                                    </Group>
+                                </Dropzone>
+                            </Grid.Col>
                             <Grid.Col span={6}>
                                 <TextInput
                                     label='Tour Name'
@@ -86,6 +137,86 @@ const CreateTour = () => {
                                     value={form.values.number_of_people}
                                     {...form.getInputProps('number_of_people')}
                                     onChange={(event) => form.setFieldValue('number_of_people', event || 0)}
+                                />
+                            </Grid.Col>
+                            <Grid.Col span={6}>
+                                <NumberInput
+                                    label='Adult Price'
+                                    placeholder='Adult Price'
+                                    required
+                                    value={form.values.adult_price}
+                                    {...form.getInputProps('adult_price')}
+                                    onChange={(event) => form.setFieldValue('adult_price', event || 0)}
+                                />
+                            </Grid.Col>
+                            <Grid.Col span={6}>
+                                <NumberInput
+                                    label='Duration'
+                                    placeholder='Duration'
+                                    required
+                                    value={form.values.duration}
+                                    {...form.getInputProps('duration')}
+                                    onChange={(event) => form.setFieldValue('duration', event || 0)}
+                                />
+                            </Grid.Col>
+                            <Grid.Col span={6}>
+                                <NumberInput
+                                    label='Kid Price'
+                                    placeholder='Kid Price'
+                                    required
+                                    value={form.values.kid_price}
+                                    {...form.getInputProps('kid_price')}
+                                    onChange={(event) => form.setFieldValue('kid_price', event || 0)}
+                                />
+                            </Grid.Col>
+                            <Grid.Col span={6}>
+                                <NumberInput
+                                    label='Max Number of People'
+                                    placeholder='Max Number of People'
+                                    required
+                                    value={form.values.max_number_of_people}
+                                    {...form.getInputProps('max_number_of_people')}
+                                    onChange={(event) => form.setFieldValue('max_number_of_people', event || 0)}
+                                />
+                            </Grid.Col>
+                            <Grid.Col span={6}>
+                                <NumberInput
+                                    label='Price'
+                                    placeholder='Price'
+                                    required
+                                    value={form.values.price}
+                                    {...form.getInputProps('price')}
+                                    onChange={(event) => form.setFieldValue('price', event || 0)}
+                                />
+                            </Grid.Col>
+                            <Grid.Col span={6}>
+                                <NumberInput
+                                    label='Number of People'
+                                    placeholder='Number of People'
+                                    required
+                                    value={form.values.number_of_people}
+                                    {...form.getInputProps('number_of_people')}
+                                    onChange={(event) => form.setFieldValue('number_of_people', event || 0)}
+                                />
+                            </Grid.Col>
+                            <Grid.Col span={6}>
+                                <MultiSelect
+                                    label='Tour Type'
+                                    placeholder='Tour Type'
+                                    required
+                                    itemComponent={SelectItem}
+                                    value={form.values.offerTypes}
+                                    data={
+                                        (Object.entries(OfferTypeEnum)).map((tourType, k) => {
+                                            return {
+                                                value: tourType[1],
+                                                label: tourType[1],
+                                            }
+                                        })
+                                    }
+                                    searchable
+
+                                    onChange={(event: any) => form.setFieldValue('offerTypes', event || [])}
                                 />
                             </Grid.Col>
                             <Grid.Col span={12}>

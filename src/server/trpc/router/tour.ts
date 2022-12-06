@@ -67,12 +67,39 @@ export const tourRouter = router({
           name: true,
           description: true,
           number_of_people: true,
+          Winery: {
+            select: {
+              name: true,
+              id: true,
+              owner: {
+                select: {
+                  name: true,
+                  email: true,
+                  id: true,
+                }
+              },
+              country: {
+                select: {
+                  name: true,
+                  image: true,
+                }
+              },
+              description: true,
+              _count: {
+                select: {
+                  Wine: true,
+                }
+              }
+            }
+          },
           tour_guide: {
             select: {
               id: true,
               name: true,
+              surname: true,
               email: true,
               phone_number: true,
+              photo: true,
               about: true,
               gender: true,
               Tour: {
@@ -81,9 +108,17 @@ export const tourRouter = router({
                   name: true,
                   description: true,
                   number_of_people: true,
+
                   Winery: {
                     select: {
                       id: true,
+                      owner: {
+                        select: {
+                          id: true,
+                          name: true,
+                        }
+                      },
+                      description: true,
                       name: true,
                       Wine: {
                         select: {
@@ -92,6 +127,22 @@ export const tourRouter = router({
                       }
                     }
                   }
+                }
+              }
+            }
+          },
+          offer: {
+            select: {
+              adult_price: true,
+              kid_price: true,
+              max_number_of_people: true,
+              offer_types: true,
+              price: true,
+              duration: true,
+              OfferTimeSlot: {
+                select: {
+                  startDate: true,
+                  endDate: true,
                 }
               }
             }
