@@ -22,6 +22,13 @@ export const userWineryRoutes = router({
       data: {
         awards: input.awards,
         description: input.description,
+        photos: {
+          createMany: {
+            data: input.photos.map(photo => ({
+              url: photo
+            }))
+          }
+        },
         userId: ctx.session.user.id,
         email: input.email,
         history: input.history,

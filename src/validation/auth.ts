@@ -23,6 +23,7 @@ const wines = z.object({
   })
 })
 export const createWinerySchema = z.object({
+  photos: z.array(z.string()),
   name: z.string(),
   countryId: z.string(),
   description: z.string(),

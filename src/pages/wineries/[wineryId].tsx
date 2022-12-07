@@ -32,7 +32,7 @@ const Winery = () => {
                 <Grid gutter={"lg"}>
                     <Grid.Col span={8}>
                         <Stack spacing={"lg"}>
-                            <TourCarousel />
+                            <TourCarousel data={(data?.photos || [])?.map(p => p.url)} />
                             <Title>
                                 {data?.name}
                             </Title>

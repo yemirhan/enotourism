@@ -9,7 +9,16 @@ import { useForm } from "@mantine/form";
 import { showNotification } from "@mantine/notifications";
 import { IconPhoto, IconUpload, IconX } from "@tabler/icons";
 import { useSession } from "next-auth/react";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import {
+    ref,
+    uploadBytes,
+    getDownloadURL,
+    listAll,
+    list,
+} from "firebase/storage";
+import { storage } from "@/utils/firebase";
+import { v4 } from "uuid";
 
 export type UpdateProfile = {
     name: string,
@@ -35,7 +44,6 @@ const UpdateProfile = () => {
             })
         }
     })
-
 
     const theme = useMantineTheme();
     const form = useForm<UpdateProfile>({
@@ -118,26 +126,17 @@ const UpdateProfile = () => {
                             <Grid.Col span={6}>
                                 <Dropzone
                                     onDrop={async (files) => {
-                                        // const f = await files?.[0]?.arrayBuffer()
+                                        const f = await files?.[0]?.arrayBuffer()
 
-                                        // if (f) {
-                                        //     supabase.storage.from("profile").upload(`profile-${user?.id}.png`, f, {
-                                                
-                                        //     }).then(({ data, error }) => {
-                                        //         if (error) {
-                                        //             showNotification({
-                                        //                 title: "Error",
-                                        //                 message: "Something went wrong",
-                                        //             })
-                                        //         } else {
-                                        //             showNotification({
-                                        //                 title: "Success",
-                                        //                 message: "Profile photo updated successfully",
-                                        //             })
-                                        //             refetch()
-                                        //         }
-                                        //     })
-                                        // }
+                                        if (f) {
+
+                                            const imageRef = ref(storage, `images/${v4()}`);
+                                            uploadBytes(imageRef, f).then((snapshot) => {
+                                                getDownloadURL(snapshot.ref).then((url) => {
+                                                    form.setFieldValue('photo', url)
+                                                });
+                                            });
+                                        }
                                     }}
                                     onReject={(files) => console.log('rejected files', files)}
                                     maxSize={3 * 1024 ** 2}

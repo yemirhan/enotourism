@@ -30,7 +30,7 @@ export const Wineries = () => {
                                 <Grid.Col span={4} key={winery.id}>
                                     <Paper withBorder p={"md"}>
                                         <Stack spacing={"xs"}>
-                                            <Image src="" height={120} withPlaceholder alt="" />
+                                            <Image src={winery.photos?.[0]?.url || ""} height={120} withPlaceholder alt="" />
                                             <Title order={3}>
                                                 {winery.name}
                                             </Title>

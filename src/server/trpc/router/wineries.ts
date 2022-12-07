@@ -11,6 +11,11 @@ export const wineriesRouter = router({
             select: {
               country: true,
             }
+          },
+          photos: {
+            select: {
+              url: true,
+            }
           }
         }
       });
@@ -39,6 +44,11 @@ export const wineriesRouter = router({
           select: {
             name: true,
             image: true,
+          }
+        },
+        photos: {
+          select: {
+            url: true,
           }
         }
       }
@@ -100,6 +110,11 @@ export const wineriesRouter = router({
               texture: true,
             },
 
+          },
+          photos: {
+            select: {
+              url: true,
+            }
           }
         },
 

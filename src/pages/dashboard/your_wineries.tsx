@@ -2,15 +2,24 @@ import Layout from '@/components/layout/Layout'
 import { WineryTable } from '@/components/userWineries/WineryTable'
 import { trpc } from '@/utils/trpc'
 import { ICreateWinery, IWine } from '@/validation/auth'
-import { Button, Container, Grid, Group, Loader, Modal, Paper, SegmentedControl, Select, Stack, Stepper, Text, Textarea, TextInput, Title } from '@mantine/core'
+import { Button, Container, Grid, Group, Image, Loader, Modal, Paper, SegmentedControl, Select, SimpleGrid, Stack, Stepper, Text, Textarea, TextInput, Title, useMantineTheme } from '@mantine/core'
+import { Dropzone, IMAGE_MIME_TYPE } from '@mantine/dropzone'
 import { useForm } from '@mantine/form'
 import { useDisclosure } from '@mantine/hooks'
 import { showNotification } from '@mantine/notifications'
 import { WineNameList, WineTypes } from '@prisma/client'
-import { IconArrowLeft, IconArrowRight, IconBarrel } from '@tabler/icons'
+import { IconArrowLeft, IconArrowRight, IconBarrel, IconPhoto, IconUpload, IconX } from '@tabler/icons'
 import { useRouter } from 'next/router'
-
 import React, { useState } from 'react'
+import {
+    ref,
+    uploadBytes,
+    getDownloadURL,
+    listAll,
+    list,
+} from "firebase/storage";
+import { storage } from "@/utils/firebase";
+import { v4 } from "uuid";
 
 const YourWineries = () => {
     const { data: wineries, isLoading } = trpc.userWinery.getWineriesOfUser.useQuery()
@@ -47,6 +56,7 @@ export default YourWineries
 
 const AddWineryModal = ({ opened, close }: { opened: boolean, close: () => void }) => {
     const router = useRouter()
+    const theme = useMantineTheme();
     const context = trpc.useContext()
     const { mutate, isLoading } = trpc.userWinery.createWinery.useMutation({
         onError: () => {
@@ -69,6 +79,16 @@ const AddWineryModal = ({ opened, close }: { opened: boolean, close: () => void 
     const [active, setActive] = useState(0);
     const nextStep = () => setActive((current) => (current < 2 ? current + 1 : current));
     const prevStep = () => setActive((current) => (current > 0 ? current - 1 : current));
+    const [photos, setPhotos] = useState<string[]>([])
+    const previews = photos.map((file, index) => {
+        return (
+            <Image
+                key={index}
+                alt="Preview"
+                src={file}
+            />
+        );
+    });
     const form = useForm<ICreateWinery>({
         initialValues: {
             name: "",
@@ -77,7 +97,8 @@ const AddWineryModal = ({ opened, close }: { opened: boolean, close: () => void 
             email: "",
             history: "",
             awards: "",
-            wines: []
+            wines: [],
+            photos: [],
         },
         validate: {
             email: (val) => (/^\S+@\S+$/.test(val) ? null : 'Invalid email'),
@@ -109,6 +130,62 @@ const AddWineryModal = ({ opened, close }: { opened: boolean, close: () => void 
         <Stepper active={active} onStepClick={setActive} breakpoint="sm">
             <Stepper.Step label="First step" description="Enter Winery Details">
                 <Grid>
+                    <Grid.Col span={12}>
+                        <Dropzone
+                            onDrop={async (files) => {
+                                const f = await files?.[0]?.arrayBuffer()
+
+                                if (f) {
+
+                                    const imageRef = ref(storage, `images/${v4()}`);
+                                    uploadBytes(imageRef, f).then((snapshot) => {
+                                        getDownloadURL(snapshot.ref).then((url) => {
+                                            setPhotos(p => [...p, url])
+                                        });
+                                    });
+                                }
+                            }}
+                            onReject={(files) => console.log('rejected files', files)}
+                            maxSize={3 * 1024 ** 2}
+                            accept={IMAGE_MIME_TYPE}
+                        >
+                            <Group position="center" spacing="xl" style={{ minHeight: 220, pointerEvents: 'none' }}>
+                                <Dropzone.Accept>
+                                    <IconUpload
+                                        size={50}
+                                        stroke={1.5}
+                                        color={theme?.colors?.[theme?.primaryColor]?.[theme.colorScheme === 'dark' ? 4 : 6]}
+                                    />
+                                </Dropzone.Accept>
+                                <Dropzone.Reject>
+                                    <IconX
+                                        size={50}
+                                        stroke={1.5}
+                                        color={theme.colors.red[theme.colorScheme === 'dark' ? 4 : 6]}
+                                    />
+                                </Dropzone.Reject>
+                                <Dropzone.Idle>
+                                    <IconPhoto size={50} stroke={1.5} />
+                                </Dropzone.Idle>
+
+                                <div>
+                                    <Text size="xl" inline>
+                                        Drag images here or click to select files
+                                    </Text>
+                                    <Text size="sm" color="dimmed" inline mt={7}>
+                                        Attach as many files as you like, each file should not exceed 5mb
+                                    </Text>
+                                </div>
+                            </Group>
+                        </Dropzone>
+                        <SimpleGrid
+                            cols={4}
+                            breakpoints={[{ maxWidth: 'sm', cols: 1 }]}
+                            mt={previews.length > 0 ? 'xl' : 0}
+                        >
+                            {previews}
+                        </SimpleGrid>
+                    </Grid.Col>
                     <Grid.Col span={4}>
                         <TextInput
                             label='Winery Name'
@@ -291,7 +368,8 @@ const AddWineryModal = ({ opened, close }: { opened: boolean, close: () => void 
                         </Button>
                         <Button onClick={() => {
                             mutate({
-                                ...form.values
+                                ...form.values,
+                                photos: photos
                             })
                         }} leftIcon={<IconBarrel size={20} />} disabled={!form.isDirty()} loading={isLoading}>
                             Create Winery
