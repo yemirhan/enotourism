@@ -133,6 +133,7 @@ export const tourRouter = router({
           },
           offer: {
             select: {
+              id: true,
               adult_price: true,
               kid_price: true,
               max_number_of_people: true,

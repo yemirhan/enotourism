@@ -6,6 +6,7 @@ import { Button, Container, Grid, Group, Loader, Modal, Paper, SegmentedControl,
 import { useForm } from '@mantine/form'
 import { useDisclosure } from '@mantine/hooks'
 import { showNotification } from '@mantine/notifications'
+import { WineNameList, WineTypes } from '@prisma/client'
 import { IconArrowLeft, IconArrowRight, IconBarrel } from '@tabler/icons'
 import { useRouter } from 'next/router'
 
@@ -89,6 +90,7 @@ const AddWineryModal = ({ opened, close }: { opened: boolean, close: () => void 
             brief_description: "",
             wine_type: {
                 color: "red",
+                type: "Albarino",
                 name: "",
                 taste: "",
                 texture: "SMOOTH",
@@ -218,23 +220,25 @@ const AddWineryModal = ({ opened, close }: { opened: boolean, close: () => void 
                                 />
                             </Grid.Col>
                             <Grid.Col span={6}>
-                                <TextInput
-                                    label='Wine Type Name'
-                                    placeholder='Wine Type Name'
-                                    {...wineForm.getInputProps('wine_type.name')}
+                                <Select
+                                    label='Wine Type'
+                                    data={Object.values(WineNameList)}
+                                    placeholder='Wine Type'
+                                    {...wineForm.getInputProps('wine_type.type')}
                                 />
                             </Grid.Col>
                             <Grid.Col span={6}>
-                                <TextInput
-                                    label='Wine Type Texture'
-                                    placeholder='Wine Type Texture'
+                                <Select
+                                    label='Wine Texture'
+                                    data={Object.values(WineTypes)}
+                                    placeholder='Wine Texture'
                                     {...wineForm.getInputProps('wine_type.texture')}
                                 />
                             </Grid.Col>
                             <Grid.Col span={6}>
                                 <TextInput
-                                    label='Wine Type Taste'
-                                    placeholder='Wine Type Taste'
+                                    label='Wine Taste'
+                                    placeholder='Wine Taste'
                                     {...wineForm.getInputProps('wine_type.taste')}
                                 />
                             </Grid.Col>

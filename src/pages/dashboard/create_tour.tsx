@@ -2,14 +2,22 @@ import ProtectedLayout from '@/components/layout/ProtectedLayout'
 import { CreateTourInput } from '@/server/trpc/router/userTours'
 import { trpc } from '@/utils/trpc'
 import { Avatar, Button, Container, Grid, Group, MultiSelect, NumberInput, Select, Stack, Text, Textarea, TextInput, Title, useMantineTheme } from '@mantine/core'
+import { DatePicker, TimeInput } from '@mantine/dates'
 import { Dropzone, IMAGE_MIME_TYPE } from '@mantine/dropzone'
 import { useForm } from '@mantine/form'
 import { showNotification } from '@mantine/notifications'
 import { OfferTypeEnum } from '@prisma/client'
 import { IconCheck, IconPhoto, IconPlus, IconUpload, IconX } from '@tabler/icons'
+import dayjs from 'dayjs'
 import React, { forwardRef } from 'react'
 
-
+const TourTypes = {
+    "TASTING": "Visit and Tasting",
+    "GUIDES": "Wine Guides",
+    "EXTRAACTIVITIES": "Extra Activities",
+    "ACCOMODATION": "Accomodation",
+    "RESTAURANT": "Restaurant"
+}
 const CreateTour = () => {
     const theme = useMantineTheme();
     const { mutate, isLoading } = trpc.userTours.createTour.useMutation({
@@ -38,6 +46,8 @@ const CreateTour = () => {
             price: 0,
             endDate: new Date(),
             startDate: new Date(),
+            start_hour: 0,
+            end_hour: 0,
         }
 
     })
@@ -180,6 +190,49 @@ const CreateTour = () => {
                                 />
                             </Grid.Col>
                             <Grid.Col span={6}>
+                                <MultiSelect
+                                    label='Tour Type'
+                                    placeholder='Tour Type'
+                                    required
+                                    itemComponent={SelectItem}
+                                    value={form.values.offerTypes}
+                                    data={
+                                        (Object.entries(OfferTypeEnum)).map((tourType, k) => {
+                                            return {
+                                                label: TourTypes[tourType[1]],
+                                                value: tourType[1],
+                                            }
+                                        })
+                                    }
+                                    searchable
+
+                                    onChange={(event: any) => form.setFieldValue('offerTypes', event || [])}
+                                />
+                            </Grid.Col>
+                            <Grid.Col span={6}>
+                                <DatePicker
+                                    label='Offer Start Date'
+                                    placeholder='Start Date'
+                                    required
+                                    minDate={dayjs(new Date()).subtract(1, 'day').toDate()}
+                                    value={form.values.startDate}
+                                    {...form.getInputProps('startDate')}
+                                    onChange={(event) => form.setFieldValue('startDate', event || new Date())}
+                                />
+                            </Grid.Col>
+
+                            <Grid.Col span={6}>
+                                <DatePicker
+                                    label='Offer End Date'
+                                    placeholder='End Date'
+                                    required
+                                    value={form.values.endDate}
+                                    {...form.getInputProps('endDate')}
+                                    onChange={(event) => form.setFieldValue('endDate', event || new Date())}
+                                />
+                            </Grid.Col>
+
+                            <Grid.Col span={6}>
                                 <NumberInput
                                     label='Price'
                                     placeholder='Price'
@@ -199,26 +252,7 @@ const CreateTour = () => {
                                     onChange={(event) => form.setFieldValue('number_of_people', event || 0)}
                                 />
                             </Grid.Col>
-                            <Grid.Col span={6}>
-                                <MultiSelect
-                                    label='Tour Type'
-                                    placeholder='Tour Type'
-                                    required
-                                    itemComponent={SelectItem}
-                                    value={form.values.offerTypes}
-                                    data={
-                                        (Object.entries(OfferTypeEnum)).map((tourType, k) => {
-                                            return {
-                                                value: tourType[1],
-                                                label: tourType[1],
-                                            }
-                                        })
-                                    }
-                                    searchable
 
-                                    onChange={(event: any) => form.setFieldValue('offerTypes', event || [])}
-                                />
-                            </Grid.Col>
                             <Grid.Col span={12}>
                                 <Textarea
                                     label='Description'

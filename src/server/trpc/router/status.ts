@@ -16,16 +16,12 @@ export const statusRoutes = router({
         cause: "You are not a taster",
       })
     }
-    return await ctx.prisma.reservation.update({
+    return await ctx.prisma.status.update({
       where: {
         id: input.id,
       },
       data: {
-        status: {
-          update: {
-            status: input.status,
-          }
-        }
+        status: input.status,
       }
     });
   })

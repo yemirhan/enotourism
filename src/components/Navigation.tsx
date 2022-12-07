@@ -30,11 +30,6 @@ const profile = {
 const userLinks = [
     profile,
     {
-        label: "Bookings",
-        icon: IconCalendarStats,
-        link: '/dashboard/bookings',
-    },
-    {
         label: "Reservations",
         icon: IconCalendarEvent,
         link: '/dashboard/reservations',

@@ -30,6 +30,102 @@ enum WineTypes {
   SMOOTH @map("smooth")
 }
 
+enum WineNameList {
+  Albarino
+  Aligote
+  Amarone
+  Arneis
+  Asti_Spumante
+  Auslese
+  Banylus
+  Barbaresco
+  Bardolino
+  Barolo
+  Beaujolais
+  Blanc_de_Blancs
+  Blanc_de_Noirs
+  Blush
+  Boal_or_Bual
+  Brunello
+  Cabernet_Franc
+  Cabernet_Sauvignon
+  Carignan
+  Carmenere
+  Cava
+  Charbono
+  Champagne
+  Chardonnay
+  Chenin_Blanc
+  Cinsaut
+  Claret
+  Cotes_du_Rhone
+  Cot
+  Cremant
+  Crozes_Hermitage
+  Dry_Sack
+  Dubonnet
+  Eiswein
+  Engadiner
+  Fendant
+  Fiano
+  Gewurztraminer
+  Gruner_Veltliner
+  Ice_Wine
+  Johannisberg_Riesling
+  Kerner
+  Kabinett
+  Lemberger
+  Liebfraumilch
+  Madera
+  Malbec
+  Marsala
+  Mavrodaphne
+  Meritage
+  Merlot
+  Meursault
+  Montepulciano
+  Moscato
+  Muscadet
+  Muscat
+  Nerello_Mascalese
+  Nero_dAvola
+  Oloroso
+  Orvieto
+  Pacherenc
+  Palomino
+  Pernod
+  Petite_Sirah
+  Pinot_Blanc
+  Pinot_Gris
+  Pinot_Noir
+  Pouilly_Fume
+  Puligny_Montrachet
+  Retsina
+  Riesling
+  Rioja
+  Roussanne
+  Saint_Emilion
+  Saint_Emilion_Grand_Cru
+  Sancerre
+  Sangiovese
+  Sauvignon_Blanc
+  Sauternes
+  Semillon
+  Sherry
+  Syrah_
+  Tannat
+  Tempranillo
+  Tignanello
+  Tokaji
+  Trebbiano
+  Ugni_Blanc
+  Valpolicella
+  Vernaccia
+  Vermouth
+  Viognier
+  Zinfandel
+}
+
 enum CountryList {
   Albania
   Argentina
@@ -226,7 +322,7 @@ model Tour {
   Winery           Winery? @relation(fields: [wineryId], references: [id])
   wineryId         String?
   tour_guide       User    @relation(fields: [tourGuideId], references: [id])
-  tourGuideId           String
+  tourGuideId      String
   offer            Offer   @relation(fields: [offerId], references: [id])
   offerId          String
 
@@ -236,16 +332,15 @@ model Tour {
 }
 
 model Wine {
-  id                String    @id @default(cuid())
+  id                String       @id @default(cuid())
   name              String
   brief_description String
   color             String
   taste             String
+  type              WineNameList
   texture           WineTypes
-  Winery            Winery?   @relation(fields: [wineryId], references: [id])
+  Winery            Winery?      @relation(fields: [wineryId], references: [id])
   wineryId          String?
-
-  
 }
 
 model Offer {
@@ -253,7 +348,7 @@ model Offer {
   name                 String
   description          String
   price                Int
-  winery               Winery?          @relation(fields: [wineryId], references: [id])
+  winery               Winery?         @relation(fields: [wineryId], references: [id])
   offer_types          OfferType[]
   adult_price          Decimal
   kid_price            Decimal
@@ -264,8 +359,6 @@ model Offer {
   OfferTimeSlot        OfferTimeSlot[]
   Reservation          Reservation[]
   Tour                 Tour[]
-
-  
 }
 
 model OfferPhoto {

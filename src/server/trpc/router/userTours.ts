@@ -17,6 +17,8 @@ const createTourInput = z.object({
   max_number_of_people: z.number(),
   startDate: z.date(),
   endDate: z.date(),
+  start_hour: z.number(),
+  end_hour: z.number(),
 
 })
 export type CreateTourInput = z.infer<typeof createTourInput>

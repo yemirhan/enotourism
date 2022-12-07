@@ -11,8 +11,16 @@ export const reservationRoutes = router({
           userId: ctx.session.user.id,
         },
         include: {
+
           offer: {
             include: {
+              Tour: {
+                select: {
+                  name: true,
+                  id: true,
+
+                }
+              },
               offer_types: true,
               OfferTimeSlot: {
                 select: {
@@ -41,20 +49,35 @@ export const reservationRoutes = router({
       })
     }
   }),
-  getReservationsOfTourGuide: protectedProcedure.input(z.object({
-
-  })).query(async ({ ctx }) => {
+  getReservationsOfTourGuide: protectedProcedure.query(async ({ ctx }) => {
     if (ctx.session.user.user_type === "GUIDE") {
       const reservations = await ctx.prisma.reservation.findMany({
         where: {
           offer: {
-            
+            Tour: {
+              some: {
+                tourGuideId: ctx.session.user.id
+              }
+            }
           }
         },
         include: {
+          user: {
+            select: {
+              name: true,
+              id: true,
+              photo: true,
+              email: true
+            }
+          },
           offer: {
             include: {
               offer_types: true,
+              Tour: {
+                select: {
+                  name: true
+                }
+              },
               OfferTimeSlot: {
                 select: {
                   startDate: true,
@@ -67,6 +90,7 @@ export const reservationRoutes = router({
           },
           status: {
             select: {
+              id: true,
               status: true,
             }
           },
@@ -86,6 +110,13 @@ export const reservationRoutes = router({
     from_time: z.number(),
     to_time: z.number(),
   })).mutation(async ({ ctx, input }) => {
+    if (ctx.session.user.user_type !== "TASTER") {
+      return new TRPCError({
+        code: "FORBIDDEN",
+        message: "You are not allowed to do this",
+        cause: "You are not a taster",
+      })
+    }
     return await ctx.prisma.reservation.create({
       data: {
         user: {

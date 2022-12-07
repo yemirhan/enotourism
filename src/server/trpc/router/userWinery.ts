@@ -30,6 +30,7 @@ export const userWineryRoutes = router({
         Wine: {
           createMany: {
             data: input.wines.map(wine => ({
+              type: wine.wine_type.type,
               name: wine.name,
               brief_description: wine.brief_description,
               color: wine.wine_type.color,

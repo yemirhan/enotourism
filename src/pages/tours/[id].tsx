@@ -4,6 +4,7 @@ import { TourTabs } from '@/components/tour/TourTabs';
 import { trpc } from '@/utils/trpc';
 import { Anchor, Avatar, Badge, Breadcrumbs, Button, Container, Flex, Grid, Group, Loader, NumberInput, Paper, Stack, Table, Text, Title } from "@mantine/core"
 import { Calendar, TimeInput } from "@mantine/dates";
+import { showNotification } from '@mantine/notifications';
 import { IconChevronRight } from "@tabler/icons";
 import dayjs from 'dayjs';
 import Link from 'next/link';
@@ -30,7 +31,17 @@ const Tour = () => {
     }, {
         enabled: router.isReady
     })
-    console.log(tour);
+    const { mutate: reserve } = trpc.reservations.reserve.useMutation({
+        onSuccess: () => {
+            showNotification({
+                title: 'Reservation created',
+                message: 'Your reservation has been created',
+            })
+            router.push("/dashboard/reservations")
+        }
+    })
+    const [selectedDate, setSelectedDate] = useState(new Date())
+    const [selectedTime, setSelectedTime] = useState(new Date())
 
     const [people, setPeople] = useState(1)
     const [kids, setKids] = useState(0)
@@ -128,7 +139,10 @@ const Tour = () => {
                                 <Text>Per Child</Text>
 
                                 <Text>Available Dates</Text>
-                                <Calendar fullWidth></Calendar>
+                                <Calendar
+                                    value={selectedDate}
+                                    onChange={(value) => setSelectedDate(value || new Date())}
+                                    fullWidth></Calendar>
                                 <Table>
                                     <thead>
                                         <tr>
@@ -139,7 +153,7 @@ const Tour = () => {
                                     </thead>
                                     <tbody>{rows}</tbody>
                                 </Table>
-                                <TimeInput label="Time of Visit" />
+                                <TimeInput value={selectedTime} onChange={(value) => setSelectedTime(value)} label="Time of Visit" />
                                 <NumberInput
                                     placeholder="Number of Adults"
                                     label="Number of People"
@@ -160,7 +174,19 @@ const Tour = () => {
                                 {/* <Text>
                                     {`Total: ${tour?.offer?.adult_price?.mul(people) + ((tour?.offer?.kid_price?.toNumber() || 0) * kids)} €`}
                                 </Text> */}
-                                <Button fullWidth>
+                                <Button
+                                    onClick={() => {
+                                        reserve({
+                                            date: selectedDate,
+                                            from_time: (selectedTime.getHours() * 100) + selectedTime.getMinutes(),
+                                            to_time: (selectedTime.getHours() * 100) + selectedTime.getMinutes(),
+                                            number_of_people: people,
+                                            number_of_kids: kids,
+                                            tourId: router.query.id as string,
+                                            offerId: tour!.offer!.id
+                                        })
+                                    }}
+                                    fullWidth>
                                     Book Now
                                 </Button>
                             </Stack>
