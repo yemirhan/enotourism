@@ -1,73 +1,50 @@
-import ProtectedLayout from '@/components/layout/ProtectedLayout'
-import { CreateTourInput } from '@/server/trpc/router/userTours'
+import Layout from '@/components/layout/Layout'
+import { CreateOfferInputs } from '@/server/trpc/router/offer'
 import { trpc } from '@/utils/trpc'
-import { Avatar, Button, Container, Grid, Group, MultiSelect, NumberInput, Select, Stack, Text, Textarea, TextInput, Title, useMantineTheme } from '@mantine/core'
-import { DatePicker, TimeInput } from '@mantine/dates'
-import { Dropzone, IMAGE_MIME_TYPE } from '@mantine/dropzone'
+import { Button, Container, Grid, Group, MultiSelect, NumberInput, Select, Stack, Text, Textarea, TextInput, Title } from '@mantine/core'
+import { DatePicker } from '@mantine/dates'
 import { useForm } from '@mantine/form'
-import { showNotification } from '@mantine/notifications'
 import { OfferTypeEnum } from '@prisma/client'
-import { IconCheck, IconPhoto, IconPlus, IconUpload, IconX } from '@tabler/icons'
+import { IconPlus } from '@tabler/icons'
 import dayjs from 'dayjs'
 import React, { forwardRef } from 'react'
+import { TourTypes } from './create_tour'
 
-export const TourTypes = {
-    "TASTING": "Visit and Tasting",
-    "GUIDES": "Wine Guides",
-    "EXTRAACTIVITIES": "Extra Activities",
-    "ACCOMODATION": "Accomodation",
-    "RESTAURANT": "Restaurant"
-}
-const CreateTour = () => {
-    const theme = useMantineTheme();
-    const { mutate, isLoading } = trpc.userTours.createTour.useMutation({
-        onSuccess() {
-            showNotification({
-                title: "Success",
-                message: "Tour created successfully",
-                icon: <IconCheck size={20} />
-            })
-        },
-    })
-    const { data: wineries } = trpc.wineries.getWineries.useQuery()
-    const form = useForm<CreateTourInput>({
+const CreateOffer = () => {
+    const { mutate: createOffer, isLoading } = trpc.offer.createOffer.useMutation()
+    const { data: wineries } = trpc.userWinery.getWineriesOfUser.useQuery()
+    const form = useForm<CreateOfferInputs>({
         initialValues: {
-            name: "",
-            description: "",
-            number_of_people: 0,
-            wineryId: "",
             adult_price: 0,
             duration: 0,
-            kid_price: 0,
-            max_number_of_people: 0,
-            offer_description: "",
-            offer_name: "",
-            offerTypes: [],
-            price: 0,
             endDate: new Date(),
             startDate: new Date(),
-            start_hour: 0,
-            end_hour: 0,
+            kid_price: 0,
+            max_number_of_people: 0,
+            name: "",
+            offerTypes: [],
+            price: 0,
+            wineryId: "",
+            description: "",
         }
-
     })
-    console.log(form.values);
-
     return (
-        <ProtectedLayout>
+        <Layout>
             <Container>
                 <Stack>
-                    <Title>
-                        Create Tour
-                    </Title>
+                    <Group>
+                        <Title>
+                            Create Offer
+                        </Title>
+                    </Group>
                     <form onSubmit={form.onSubmit(() => {
-                        mutate({
+                        createOffer({
                             ...form.values
                         })
                     })}>
                         <Grid>
                             <Grid.Col span={12}>
-                                <Dropzone
+                                {/* <Dropzone
                                     onDrop={(files) => console.log('accepted files', files)}
                                     onReject={(files) => console.log('rejected files', files)}
                                     maxSize={3 * 1024 ** 2}
@@ -101,12 +78,12 @@ const CreateTour = () => {
                                             </Text>
                                         </div>
                                     </Group>
-                                </Dropzone>
+                                </Dropzone> */}
                             </Grid.Col>
                             <Grid.Col span={6}>
                                 <TextInput
-                                    label='Tour Name'
-                                    placeholder='Tour Name'
+                                    label='Offer Name'
+                                    placeholder='Offer Name'
                                     required
                                     value={form.values.name}
                                     {...form.getInputProps('name')}
@@ -141,12 +118,12 @@ const CreateTour = () => {
 
                             <Grid.Col span={6}>
                                 <NumberInput
-                                    label='Number of People'
-                                    placeholder='Number of People'
+                                    label='MaxNumber of People'
+                                    placeholder='Max Number of People'
                                     required
-                                    value={form.values.number_of_people}
-                                    {...form.getInputProps('number_of_people')}
-                                    onChange={(event) => form.setFieldValue('number_of_people', event || 0)}
+                                    value={form.values.max_number_of_people}
+                                    {...form.getInputProps('max_number_of_people')}
+                                    onChange={(event) => form.setFieldValue('max_number_of_people', event || 0)}
                                 />
                             </Grid.Col>
                             <Grid.Col span={6}>
@@ -191,8 +168,8 @@ const CreateTour = () => {
                             </Grid.Col>
                             <Grid.Col span={6}>
                                 <MultiSelect
-                                    label='Tour Type'
-                                    placeholder='Tour Type'
+                                    label='Offer Type'
+                                    placeholder='Offer Type'
                                     required
                                     itemComponent={SelectItem}
                                     value={form.values.offerTypes}
@@ -242,16 +219,7 @@ const CreateTour = () => {
                                     onChange={(event) => form.setFieldValue('price', event || 0)}
                                 />
                             </Grid.Col>
-                            <Grid.Col span={6}>
-                                <NumberInput
-                                    label='Number of People'
-                                    placeholder='Number of People'
-                                    required
-                                    value={form.values.number_of_people}
-                                    {...form.getInputProps('number_of_people')}
-                                    onChange={(event) => form.setFieldValue('number_of_people', event || 0)}
-                                />
-                            </Grid.Col>
+
 
                             <Grid.Col span={12}>
                                 <Textarea
@@ -270,18 +238,17 @@ const CreateTour = () => {
                         </Grid>
                         <Group mt={"lg"} position='right'>
                             <Button leftIcon={<IconPlus size={18} />} type='submit' loading={isLoading}>
-                                Create Tour
+                                Create Offer
                             </Button>
                         </Group>
                     </form>
                 </Stack>
             </Container>
-        </ProtectedLayout>
+        </Layout>
     )
 }
 
-export default CreateTour
-
+export default CreateOffer
 
 interface ItemProps extends React.ComponentPropsWithoutRef<'div'> {
     wineryId: string,

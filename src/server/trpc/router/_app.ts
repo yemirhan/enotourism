@@ -13,6 +13,7 @@ import { tourRouter } from "./tour";
 import { countryRouter } from "./countries";
 import { reservationRoutes } from "./reservation";
 import { statusRoutes } from "./status";
+import { offerRoutes } from "./offer";
 
 export const appRouter = router({
   protected: protectedRouter,
@@ -28,7 +29,8 @@ export const appRouter = router({
   tour: tourRouter,
   countries: countryRouter,
   reservations: reservationRoutes,
-  status: statusRoutes
+  status: statusRoutes,
+  offer: offerRoutes
 });
 
 // export type definition of API

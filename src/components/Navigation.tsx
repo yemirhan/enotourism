@@ -10,7 +10,8 @@ import {
     IconUser,
     IconBarrel,
     IconBottle,
-    IconCalendarEvent
+    IconCalendarEvent,
+    IconMap
 } from '@tabler/icons';
 import { useSession } from 'next-auth/react';
 import { LinksGroup } from './LinksGroup';
@@ -42,7 +43,6 @@ const wineryLinks = [
         icon: IconBarrel,
         links: [
             { label: 'Your Wineries', link: '/dashboard/your_wineries' },
-            { label: 'Create a new Winery', link: '/dashboard/create_winery' },
         ],
     },
     {
@@ -54,7 +54,15 @@ const wineryLinks = [
         label: "Bookings",
         icon: IconCalendarStats,
         link: '/dashboard/bookings',
-    }
+    },
+    {
+        label: 'Offers',
+        icon: IconMap,
+        links: [
+            { label: 'Your Offers', link: '/dashboard/your_offers' },
+            { label: 'Create a new Offer', link: '/dashboard/create_offer' },
+        ],
+    },
 ];
 
 const tourGuideLinks = [

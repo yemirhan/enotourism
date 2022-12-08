@@ -13,6 +13,13 @@ export const userWineryRoutes = router({
               equals: ctx.session.user.id,
             }
           }
+        },
+        include: {
+          address: {
+            include: {
+              country: true,
+            }
+          }
         }
       });
       return wineries;
