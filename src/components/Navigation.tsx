@@ -53,7 +53,7 @@ const wineryLinks = [
     {
         label: "Bookings",
         icon: IconCalendarStats,
-        link: '/dashboard/bookings',
+        link: '/dashboard/winery_bookings',
     },
     {
         label: 'Offers',

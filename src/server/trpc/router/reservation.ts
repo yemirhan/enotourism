@@ -99,7 +99,15 @@ export const reservationRoutes = router({
       return reservations;
     }
   }),
-
+  // getReservationsOfWinery: protectedProcedure.input(z.object({
+  //   wineryIds: z.array(z.string())
+  // })).query(async ({ctx, input}) => {
+  //   return ctx.prisma.reservation.findMany({
+  //     where: {
+        
+  //     }
+  //   })
+  // })
 
   reserve: protectedProcedure.input(z.object({
     tourId: z.string(),
