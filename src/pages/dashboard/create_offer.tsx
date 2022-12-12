@@ -1,35 +1,54 @@
 import Layout from '@/components/layout/Layout'
 import { CreateOfferInputs } from '@/server/trpc/router/offer'
 import { trpc } from '@/utils/trpc'
-import { Button, Container, Grid, Group, MultiSelect, NumberInput, Select, Stack, Text, Textarea, TextInput, Title } from '@mantine/core'
-import { DatePicker } from '@mantine/dates'
+import { Button, Checkbox, Container, Grid, Group, Image, MultiSelect, NumberInput, Select, SimpleGrid, Stack, Text, Textarea, TextInput, Title, useMantineTheme } from '@mantine/core'
+import { DatePicker, TimeInput } from '@mantine/dates'
+import { Dropzone, IMAGE_MIME_TYPE } from '@mantine/dropzone'
 import { useForm } from '@mantine/form'
 import { OfferTypeEnum } from '@prisma/client'
-import { IconCashBanknote, IconClock, IconPlus, IconUsers } from '@tabler/icons'
+import { IconCashBanknote, IconClock, IconPhoto, IconPlus, IconUpload, IconUsers, IconX } from '@tabler/icons'
 import dayjs from 'dayjs'
 import React, { forwardRef } from 'react'
 import { TourTypes } from './create_tour'
+import {
+    ref,
+    uploadBytes,
+    getDownloadURL,
+    listAll,
+    list,
+} from "firebase/storage";
+import { storage } from "@/utils/firebase";
+import { v4 } from "uuid";
 
 const CreateOffer = () => {
+    const theme = useMantineTheme();
     const { mutate: createOffer, isLoading } = trpc.offer.createOffer.useMutation()
     const { data: wineries } = trpc.userWinery.getWineriesOfUser.useQuery()
     const form = useForm<CreateOfferInputs>({
         initialValues: {
-            adult_price: 0,
-            duration: 0,
-            endDate: new Date(),
-            startDate: new Date(),
-            kid_price: 0,
-            max_number_of_people: 0,
             name: "",
-            offerTypes: [],
-            price: 0,
+            date: new Date(),
+            startsAt: new Date(),
+            duration: 1,
+            adult_price: 0,
+            kid_price: 0,
+            kids_allowed: true,
+            max_number_of_people: 10,
             wineryId: "",
             description: "",
-            endTime: new Date(),
-            startTime: new Date()
+            photos: [],
+            offerType: OfferTypeEnum.RESTAURANT
         }
     })
+    const previews = form.values.photos.map((file, index) => {
+        return (
+            <Image
+                key={index}
+                alt="Preview"
+                src={file}
+            />
+        );
+    });
     return (
         <Layout>
             <Container>
@@ -46,8 +65,20 @@ const CreateOffer = () => {
                     })}>
                         <Grid>
                             <Grid.Col span={12}>
-                                {/* <Dropzone
-                                    onDrop={(files) => console.log('accepted files', files)}
+                                <Dropzone
+                                    onDrop={async (files) => {
+                                        const f = await files?.[0]?.arrayBuffer()
+
+                                        if (f) {
+
+                                            const imageRef = ref(storage, `images/${v4()}`);
+                                            uploadBytes(imageRef, f).then((snapshot) => {
+                                                getDownloadURL(snapshot.ref).then((url) => {
+                                                    form.setFieldValue('photos', [...form.values.photos, url])
+                                                });
+                                            });
+                                        }
+                                    }}
                                     onReject={(files) => console.log('rejected files', files)}
                                     maxSize={3 * 1024 ** 2}
                                     accept={IMAGE_MIME_TYPE}
@@ -80,7 +111,14 @@ const CreateOffer = () => {
                                             </Text>
                                         </div>
                                     </Group>
-                                </Dropzone> */}
+                                </Dropzone>
+                                <SimpleGrid
+                                    cols={4}
+                                    breakpoints={[{ maxWidth: 'sm', cols: 1 }]}
+                                    mt={previews.length > 0 ? 'xl' : 0}
+                                >
+                                    {previews}
+                                </SimpleGrid>
                             </Grid.Col>
                             <Grid.Col span={6}>
                                 <TextInput
@@ -98,7 +136,7 @@ const CreateOffer = () => {
                                     label='Winery'
                                     placeholder='Winery'
                                     required
-                                    itemComponent={SelectItem}
+
                                     value={form.values.wineryId}
                                     data={
                                         (wineries || []).map(winery => {
@@ -117,7 +155,20 @@ const CreateOffer = () => {
                                 />
 
                             </Grid.Col>
-
+                            <Grid.Col span={6}>
+                                <NumberInput
+                                    icon={<IconClock size={20} />}
+                                    label='Duration'
+                                    step={0.25}
+                                    precision={2}
+                                    min={0.5}
+                                    placeholder='Duration'
+                                    required
+                                    value={form.values.duration}
+                                    {...form.getInputProps('duration')}
+                                    onChange={(event) => form.setFieldValue('duration', event || 0)}
+                                />
+                            </Grid.Col>
 
                             <Grid.Col span={6}>
                                 <NumberInput
@@ -131,27 +182,25 @@ const CreateOffer = () => {
                                 />
                             </Grid.Col>
                             <Grid.Col span={6}>
+                                <Checkbox
+                                    label='Kids Allowed'
+                                    checked={form.values.kids_allowed}
+                                    {...form.getInputProps('kids_allowed')}
+                                    onChange={(event) => form.setFieldValue('kids_allowed', event.currentTarget.checked)}
+                                />
+                            </Grid.Col>
+                            <Grid.Col span={6}>
                                 <NumberInput
                                     icon={<IconCashBanknote size={18} />}
                                     label='Kid Price'
                                     placeholder='Kid Price'
-                                    required
+                                    disabled={!form.values.kids_allowed}
                                     value={form.values.kid_price}
                                     {...form.getInputProps('kid_price')}
                                     onChange={(event) => form.setFieldValue('kid_price', event || 0)}
                                 />
                             </Grid.Col>
-                            <Grid.Col span={6}>
-                                <NumberInput
-                                    icon={<IconClock size={20} />}
-                                    label='Duration'
-                                    placeholder='Duration'
-                                    required
-                                    value={form.values.duration}
-                                    {...form.getInputProps('duration')}
-                                    onChange={(event) => form.setFieldValue('duration', event || 0)}
-                                />
-                            </Grid.Col>
+
 
                             <Grid.Col span={6}>
                                 <NumberInput
@@ -165,12 +214,12 @@ const CreateOffer = () => {
                                 />
                             </Grid.Col>
                             <Grid.Col span={6}>
-                                <MultiSelect
+                                <Select
                                     label='Offer Type'
                                     placeholder='Offer Type'
                                     required
                                     itemComponent={SelectItem}
-                                    value={form.values.offerTypes}
+                                    value={form.values.offerType}
                                     data={
                                         (Object.entries(OfferTypeEnum)).map((tourType, k) => {
                                             return {
@@ -181,31 +230,32 @@ const CreateOffer = () => {
                                     }
                                     searchable
 
-                                    onChange={(event: any) => form.setFieldValue('offerTypes', event || [])}
+                                    onChange={(event: any) => form.setFieldValue('offerType', event)}
+                                />
+                            </Grid.Col>
+                            <Grid.Col span={6}>
+                                <TimeInput
+                                    label='Offer Starts At'
+                                    placeholder='Offer Starts At'
+                                    required
+
+                                    value={form.values.startsAt}
+                                    {...form.getInputProps('startsAt')}
+                                    onChange={(event) => form.setFieldValue('startsAt', event || new Date())}
                                 />
                             </Grid.Col>
                             <Grid.Col span={6}>
                                 <DatePicker
-                                    label='Offer Start Date'
-                                    placeholder='Start Date'
-                                    required
+                                    label='Offer Date'
+                                    placeholder='Offer Date'
                                     minDate={dayjs(new Date()).subtract(1, 'day').toDate()}
-                                    value={form.values.startDate}
-                                    {...form.getInputProps('startDate')}
-                                    onChange={(event) => form.setFieldValue('startDate', event || new Date())}
+                                    required
+                                    value={form.values.date}
+                                    {...form.getInputProps('date')}
+                                    onChange={(event) => form.setFieldValue('date', event || new Date())}
                                 />
                             </Grid.Col>
 
-                            <Grid.Col span={6}>
-                                <DatePicker
-                                    label='Offer End Date'
-                                    placeholder='End Date'
-                                    required
-                                    value={form.values.endDate}
-                                    {...form.getInputProps('endDate')}
-                                    onChange={(event) => form.setFieldValue('endDate', event || new Date())}
-                                />
-                            </Grid.Col>
                             <Grid.Col span={12}>
                                 <Textarea
                                     label='Description'

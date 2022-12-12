@@ -2,19 +2,18 @@ import { OfferTypeEnum } from "@prisma/client";
 import { z } from "zod";
 import { protectedProcedure, router } from "../trpc";
 const createOfferInputs = z.object({
-  adult_price: z.number(),
-  description: z.string(),
-  duration: z.number(),
-  kid_price: z.number(),
   name: z.string(),
-  price: z.number(),
+  date: z.date(),
+  startsAt: z.date(),
+  duration: z.number(),
+  adult_price: z.number(),
+  kid_price: z.number(),
+  kids_allowed: z.boolean(),
   max_number_of_people: z.number(),
   wineryId: z.string(),
-  offerTypes: z.array(z.nativeEnum(OfferTypeEnum)),
-  startDate: z.date(),
-  endDate: z.date(),
-  startTime: z.date(),
-  endTime: z.date()
+  description: z.string(),
+  photos: z.array(z.string()),
+  offerType: z.nativeEnum(OfferTypeEnum),
 })
 export type CreateOfferInputs = z.infer<typeof createOfferInputs>;
 export const offerRoutes = router({
@@ -27,21 +26,26 @@ export const offerRoutes = router({
         duration: input.duration,
         kid_price: input.kid_price,
         name: input.name,
-        price: input.price,
+        price: 0,
         max_number_of_people: input.max_number_of_people,
         offer_types: {
+          create: {
+            name: input.offerType,
+          }
+        },
+        photos: {
           createMany: {
-            data: input.offerTypes.map((type) => ({
-              name: type,
-            })),
+            data: [...input.photos].map(photo => ({
+              url: photo
+            }))
           }
         },
         OfferTimeSlot: {
           create: {
-            startTime: input.startTime,
-            endTime: input.endTime,
-            startDate: input.startDate,
-            endDate: input.endDate,
+            startTime: input.startsAt,
+            endTime: new Date(),
+            startDate: input.date,
+            endDate: new Date(),
           }
         },
         winery: {

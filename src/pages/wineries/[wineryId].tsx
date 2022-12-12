@@ -1,11 +1,12 @@
 import Layout from '@/components/layout/Layout'
 import { TourCarousel } from '@/components/tour/TourCarousel'
 import { trpc } from '@/utils/trpc'
-import { Anchor, Avatar, Badge, Breadcrumbs, Button, Container, Flex, Grid, Group, Loader, NumberInput, Paper, Stack, Text, Title } from '@mantine/core'
+import { Anchor, Avatar, Badge, Breadcrumbs, Button, Container, Flex, Grid, Group, Indicator, Loader, NumberInput, Paper, Stack, Text, Title, Tooltip } from '@mantine/core'
 import { Calendar, TimeInput } from '@mantine/dates'
 import { showNotification } from '@mantine/notifications'
 import type { Offer, OfferTimeSlot, OfferType } from '@prisma/client'
 import { IconBottleOff, IconChevronRight } from '@tabler/icons'
+import dayjs from 'dayjs'
 
 import Link from 'next/link'
 import { useRouter } from 'next/router'
@@ -133,6 +134,28 @@ const Winery = () => {
                                 </Stack>
                             </Paper>
                         })}
+                        <Paper withBorder p={"xl"} mt="md" >
+                            <Title order={3}>
+                                Available Dates
+                            </Title>
+                            <Calendar
+                                mt={"md"}
+                                renderDay={(date) => {
+                                    const day = date.getDate();
+                                    const a = date.getDay();
+                                    return (
+                                        <Tooltip label={data?.WorkingHours.find(wd => wd.day === a) ? `Opens: ${dayjs(data?.WorkingHours.find(wd => wd.day === a)?.open).format("HH:mm")}, Closes: ${dayjs(data?.WorkingHours.find(wd => wd.day === a)?.close).format("HH:mm")}` : ""} withArrow>
+                                            <Indicator label="1" color="red" offset={8} position="bottom-center" disabled={true}>
+                                                {/* offers?.map(offer => offer.OfferTimeSlot?.[0]?.startDate) */}
+                                                <div>{day}</div>
+                                            </Indicator>
+                                        </Tooltip>
+                                    );
+                                }}
+                                excludeDate={date => !((data?.WorkingHours || []).map(wh => wh.day).includes(date.getDay()))}
+                                fullWidth
+                            />
+                        </Paper>
                         {
                             selectedOffer !== null ? <Paper withBorder p={"xl"} mt="md">
                                 <SelectedOffer offer={(offers || [])?.find(offer => offer.id === selectedOffer)} />

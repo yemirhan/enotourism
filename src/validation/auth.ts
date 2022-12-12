@@ -40,8 +40,8 @@ export const createWinerySchema = z.object({
     flat: z.string(),
   }),
   workingHours: z.array(z.object({
+    day: z.number(),
     close: z.date(),
-    day: z.date(),
     open: z.date()
   }))
 })

@@ -28,7 +28,7 @@ export const userWineryRoutes = router({
     const address = await ctx.prisma.address.create({
       data: {
         countryId: input.address.countryId,
-        regionId: input.address.regionId,
+        // regionId: input.address.regionId,
         city: input.address.city,
         address: "",
         street: input.address.street,

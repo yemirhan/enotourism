@@ -222,8 +222,8 @@ model Address {
   postcode           String?
   country            Country @relation(fields: [countryId], references: [id])
   countryId          String  @unique
-  region             Region  @relation(fields: [regionId], references: [id])
-  regionId           String  @unique
+  region             Region? @relation(fields: [regionId], references: [id])
+  regionId           String? @unique
 
   user_id String   @unique
   user    User     @relation(fields: [user_id], references: [id])
@@ -294,9 +294,9 @@ model Language {
 
 model WorkingHours {
   id       String   @id @default(cuid())
-  day      DateTime
-  open     DateTime
-  close    DateTime
+  day      Int
+  open     DateTime @db.Time()
+  close    DateTime @db.Time()
   Winery   Winery?  @relation(fields: [wineryId], references: [id])
   wineryId String?
 
@@ -363,6 +363,12 @@ enum OfferTypeEnum {
   EXTRAACTIVITIES @map("Extra Activities")
   ACCOMODATION    @map("Accomodation")
   RESTAURANT      @map("Restaurant")
+  CHEESE         @map("Cheese")
+  WINEMAKING     @map("Winemaking")
+  WORKSHOPS     @map("Workshops")
+  SIGHTSEEING   @map("Sightseeing")
+  WINELECTURE   @map("Wine Lecture")
+  
 }
 
 model OfferType {

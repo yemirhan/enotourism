@@ -2,7 +2,7 @@ import Layout from '@/components/layout/Layout'
 import { WineryTable } from '@/components/userWineries/WineryTable'
 import { trpc } from '@/utils/trpc'
 import { ICreateWinery, IWine } from '@/validation/auth'
-import { Button, Container, Grid, Group, Image, Loader, Modal, Paper, SegmentedControl, Select, SimpleGrid, Stack, Stepper, Text, Textarea, TextInput, Title, useMantineTheme } from '@mantine/core'
+import { Button, Checkbox, Container, Flex, Grid, Group, Image, Loader, Modal, Paper, SegmentedControl, Select, SimpleGrid, Stack, Stepper, Text, Textarea, TextInput, Title, useMantineTheme } from '@mantine/core'
 import { Dropzone, IMAGE_MIME_TYPE } from '@mantine/dropzone'
 import { useForm } from '@mantine/form'
 import { useDisclosure } from '@mantine/hooks'
@@ -20,6 +20,7 @@ import {
 } from "firebase/storage";
 import { storage } from "@/utils/firebase";
 import { v4 } from "uuid";
+import { TimeInput } from '@mantine/dates'
 
 const YourWineries = () => {
     const { data: wineries, isLoading } = trpc.userWinery.getWineriesOfUser.useQuery()
@@ -53,7 +54,13 @@ const YourWineries = () => {
 }
 
 export default YourWineries
-
+type DateType = {
+    day: number,
+    close: Date,
+    open: Date,
+    selected: boolean,
+    dateName: string
+}
 const AddWineryModal = ({ opened, close }: { opened: boolean, close: () => void }) => {
     const router = useRouter()
     const theme = useMantineTheme();
@@ -77,7 +84,58 @@ const AddWineryModal = ({ opened, close }: { opened: boolean, close: () => void 
     })
     const { data: countries } = trpc.countries.getCountries.useQuery()
     const [active, setActive] = useState(0);
-    const nextStep = () => setActive((current) => (current < 2 ? current + 1 : current));
+    const [workingDates, setWorkingDates] = useState<Record<number, DateType>>({
+        0: {
+            day: 0,
+            close: new Date(),
+            open: new Date(),
+            selected: false,
+            dateName: "Sunday"
+        },
+        1: {
+            day: 1,
+            close: new Date(),
+            open: new Date(),
+            selected: false,
+            dateName: "Monday"
+        },
+        2: {
+            day: 2,
+            close: new Date(),
+            open: new Date(),
+            selected: false,
+            dateName: "Tuesday"
+        },
+        3: {
+            day: 3,
+            close: new Date(),
+            open: new Date(),
+            selected: false,
+            dateName: "Wednesday"
+        },
+        4: {
+            day: 4,
+            close: new Date(),
+            open: new Date(),
+            selected: false,
+            dateName: "Thursday"
+        },
+        5: {
+            day: 5,
+            close: new Date(),
+            open: new Date(),
+            selected: false,
+            dateName: "Friday"
+        },
+        6: {
+            day: 6,
+            close: new Date(),
+            open: new Date(),
+            selected: false,
+            dateName: "Saturday"
+        },
+    })
+    const nextStep = () => setActive((current) => (current < 4 ? current + 1 : current));
     const prevStep = () => setActive((current) => (current > 0 ? current - 1 : current));
     const [photos, setPhotos] = useState<string[]>([])
     const previews = photos.map((file, index) => {
@@ -194,7 +252,7 @@ const AddWineryModal = ({ opened, close }: { opened: boolean, close: () => void 
                             {previews}
                         </SimpleGrid>
                     </Grid.Col>
-                    <Grid.Col span={4}>
+                    <Grid.Col span={6}>
                         <TextInput
                             label='Winery Name'
                             placeholder='Winery Name'
@@ -204,7 +262,7 @@ const AddWineryModal = ({ opened, close }: { opened: boolean, close: () => void 
                             onChange={(event) => form.setFieldValue('name', event.currentTarget.value)}
                         />
                     </Grid.Col>
-                    <Grid.Col span={4}>
+                    <Grid.Col span={6}>
                         <TextInput
                             label='E-Mail'
                             placeholder='E-Mail'
@@ -215,19 +273,7 @@ const AddWineryModal = ({ opened, close }: { opened: boolean, close: () => void 
                             onChange={(event) => form.setFieldValue('email', event.currentTarget.value)}
                         />
                     </Grid.Col>
-                    <Grid.Col span={4}>
-                        <Select
-                            label='Country'
-                            placeholder='Country'
-                            required
-                            value={form.values.countryId}
-                            data={
-                                (countries || []).map(c => ({ value: c.id, label: c.name }))
-                            }
 
-                            onChange={(event) => form.setFieldValue('countryId', event || "")}
-                        />
-                    </Grid.Col>
                     <Grid.Col span={12}>
                         <Textarea
                             label='Description'
@@ -357,13 +403,111 @@ const AddWineryModal = ({ opened, close }: { opened: boolean, close: () => void 
                     </Grid.Col>
                 </Grid>
             </Stepper.Step>
+            <Stepper.Step label="Third step" description="Add address details">
+                <Grid>
+                    <Grid.Col span={6}>
+                        <Select
+                            label='Country'
+                            placeholder='Country'
+                            required
+                            value={form.values.address.countryId}
+                            data={
+                                (countries || []).map(c => ({ value: c.id, label: c.name }))
+                            }
 
+                            onChange={(event) => form.setFieldValue('address.countryId', event || "")}
+                        />
+                    </Grid.Col>
+                    <Grid.Col span={6}>
+                        <Select
+                            label='Region'
+                            placeholder='Region'
+                            required
+                            value={form.values.address.regionId}
+                            data={
+                                (countries || []).map(c => ({ value: c.id, label: c.name }))
+                            }
+
+                            onChange={(event) => form.setFieldValue('address.regionId', event || "")}
+                        />
+                    </Grid.Col>
+                    <Grid.Col span={6}>
+                        <TextInput
+                            label='City'
+                            placeholder='City'
+                            required
+                            value={form.values.address.city}
+                            onChange={(event) => form.setFieldValue('address.city', event.currentTarget.value)}
+                        />
+                    </Grid.Col>
+
+                    <Grid.Col span={6}>
+                        <TextInput
+
+                            label='Street'
+                            placeholder='Street'
+                            required
+                            value={form.values.address.street}
+                            onChange={(event) => form.setFieldValue('address.street', event.currentTarget.value)}
+                        />
+                    </Grid.Col>
+                    <Grid.Col span={6}>
+                        <TextInput
+                            label="Flat"
+                            placeholder="Flat"
+                            value={form.values.address.flat}
+                            onChange={(event) => form.setFieldValue('address.flat', event.currentTarget.value)}
+                        />
+                    </Grid.Col>
+                </Grid>
+
+            </Stepper.Step>
+            <Stepper.Step label="Fourth step" description="Add open/close dates">
+                <Grid>
+                    {
+                        [0, 1, 2, 3, 4, 5, 6].map(day => {
+
+                            return <Grid.Col key={day} span={4}>
+                                <Paper withBorder p={"md"}>
+                                    <Checkbox
+                                        label={workingDates[day]?.dateName}
+                                        checked={workingDates[day]?.selected}
+                                        onChange={(e) => {
+                                            setWorkingDates(wd => ({ ...wd, [day]: { ...wd[day] as DateType, selected: e.target.checked } }))
+                                        }}
+                                    />
+                                    <Flex direction={"row"} w={"100%"} gap="md">
+                                        <TimeInput
+                                            label='Opens at'
+                                            value={workingDates[day]?.open}
+                                            clearable
+                                            w="50%"
+                                            onChange={(e) => {
+                                                setWorkingDates(wd => ({ ...wd, [day]: { ...wd[day] as DateType, open: e } }))
+                                            }}
+                                        />
+                                        <TimeInput
+                                            label='Closes at'
+                                            w="50%"
+                                            clearable
+                                            value={workingDates[day]?.close}
+                                            onChange={(e) => {
+                                                setWorkingDates(wd => ({ ...wd, [day]: { ...wd[day] as DateType, close: e } }))
+                                            }}
+                                        />
+                                    </Flex>
+                                </Paper>
+                            </Grid.Col>
+                        })
+                    }
+                </Grid>
+            </Stepper.Step>
         </Stepper>
 
 
         <Group position='right' mt={"lg"}>
             {
-                active === 0 ? <Button
+                active !== 3 ? <Button
                     leftIcon={<IconArrowRight size={20} />}
                     onClick={nextStep}>
                     Next Step
@@ -377,7 +521,12 @@ const AddWineryModal = ({ opened, close }: { opened: boolean, close: () => void 
                         <Button onClick={() => {
                             mutate({
                                 ...form.values,
-                                photos: photos
+                                photos: photos,
+                                workingHours: Object.values(workingDates).filter(wd => wd.selected).map(wd => ({
+                                    day: wd.day,
+                                    open: wd.open,
+                                    close: wd.close
+                                }))
                             })
                         }} leftIcon={<IconBarrel size={20} />} disabled={!form.isDirty()} loading={isLoading}>
                             Create Winery

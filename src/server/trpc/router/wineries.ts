@@ -78,6 +78,7 @@ export const wineriesRouter = router({
           email: true,
           history: true,
           language: true,
+          WorkingHours: true,
           _count: {
             select: {
               Wine: true,

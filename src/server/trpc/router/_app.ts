@@ -30,7 +30,8 @@ export const appRouter = router({
   countries: countryRouter,
   reservations: reservationRoutes,
   status: statusRoutes,
-  offer: offerRoutes
+  offer: offerRoutes,
+  wines: wineRouter
 });
 
 // export type definition of API

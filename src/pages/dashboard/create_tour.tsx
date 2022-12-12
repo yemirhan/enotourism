@@ -16,7 +16,12 @@ export const TourTypes = {
     "GUIDES": "Wine Guides",
     "EXTRAACTIVITIES": "Extra Activities",
     "ACCOMODATION": "Accomodation",
-    "RESTAURANT": "Restaurant"
+    "RESTAURANT": "Restaurant",
+    CHEESE: "Wine Tasting with Cheese",
+    WINEMAKING: "Wine Making",
+    WORKSHOPS: "Workshops",
+    SIGHTSEEING: "Sightseeing",
+    WINELECTURE: "Wine Lectures",
 }
 const CreateTour = () => {
     const theme = useMantineTheme();
