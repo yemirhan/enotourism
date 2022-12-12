@@ -25,6 +25,17 @@ export const userWineryRoutes = router({
       return wineries;
     }),
   createWinery: protectedProcedure.input(createWinerySchema).mutation(async ({ input, ctx }) => {
+    const address = await ctx.prisma.address.create({
+      data: {
+        countryId: input.address.countryId,
+        regionId: input.address.regionId,
+        city: input.address.city,
+        address: "",
+        street: input.address.street,
+        flat: input.address.flat,
+        user_id: ctx.session.user.id
+      }
+    })
     const winery = await ctx.prisma.winery.create({
       data: {
         awards: input.awards,
@@ -40,7 +51,12 @@ export const userWineryRoutes = router({
         email: input.email,
         history: input.history,
         name: input.name,
-        countryId: input.countryId,
+        addressId: address.id,
+        WorkingHours: {
+          createMany: {
+            data: input.workingHours.map(h => ({ open: h.open, close: h.close, day: h.day }))
+          }
+        },
         Wine: {
           createMany: {
             data: input.wines.map(wine => ({

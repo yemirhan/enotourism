@@ -19,34 +19,13 @@ const createTourInput = z.object({
   endDate: z.date(),
   start_hour: z.number(),
   end_hour: z.number(),
-
+  startTime: z.date(),
+  endTime: z.date()
 })
 export type CreateTourInput = z.infer<typeof createTourInput>
 
 export const userToursRoutes = router({
-  getToursOfUser: protectedProcedure
-    .query(async ({ ctx }) => {
-      const wineries = await ctx.prisma.winery.findMany({
-        where: {
-          owner: {
-            id: {
-              equals: ctx.session.user.id,
-            }
-          }
-        },
-        select: {
-          id: true,
-        }
-      });
-      const tours = await ctx.prisma.tour.findMany({
-        where: {
-          wineryId: {
-            in: wineries.map(winery => winery.id)
-          }
-        }
-      });
-      return tours;
-    }),
+
   getToursOfTourGuide: protectedProcedure.query(async ({ ctx }) => {
     const tours = await ctx.prisma.tour.findMany({
       where: {
@@ -67,6 +46,8 @@ export const userToursRoutes = router({
         description: input.description,
         name: input.name,
         number_of_people: input.number_of_people,
+        startsAt: input.startTime,
+        endsAt: input.endTime,
         offer: {
           create: {
             offer_types: {
@@ -78,9 +59,11 @@ export const userToursRoutes = router({
             },
             OfferTimeSlot: {
               create: {
+                endTime: input.endTime,
+                startTime: input.startTime,
                 startDate: input.startDate,
                 endDate: input.endDate,
-                
+
               }
             },
             price: input.price,

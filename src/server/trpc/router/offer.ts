@@ -13,6 +13,8 @@ const createOfferInputs = z.object({
   offerTypes: z.array(z.nativeEnum(OfferTypeEnum)),
   startDate: z.date(),
   endDate: z.date(),
+  startTime: z.date(),
+  endTime: z.date()
 })
 export type CreateOfferInputs = z.infer<typeof createOfferInputs>;
 export const offerRoutes = router({
@@ -36,6 +38,8 @@ export const offerRoutes = router({
         },
         OfferTimeSlot: {
           create: {
+            startTime: input.startTime,
+            endTime: input.endTime,
             startDate: input.startDate,
             endDate: input.endDate,
           }

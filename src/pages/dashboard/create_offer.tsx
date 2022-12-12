@@ -5,7 +5,7 @@ import { Button, Container, Grid, Group, MultiSelect, NumberInput, Select, Stack
 import { DatePicker } from '@mantine/dates'
 import { useForm } from '@mantine/form'
 import { OfferTypeEnum } from '@prisma/client'
-import { IconPlus } from '@tabler/icons'
+import { IconCashBanknote, IconClock, IconPlus, IconUsers } from '@tabler/icons'
 import dayjs from 'dayjs'
 import React, { forwardRef } from 'react'
 import { TourTypes } from './create_tour'
@@ -26,6 +26,8 @@ const CreateOffer = () => {
             price: 0,
             wineryId: "",
             description: "",
+            endTime: new Date(),
+            startTime: new Date()
         }
     })
     return (
@@ -116,18 +118,10 @@ const CreateOffer = () => {
 
                             </Grid.Col>
 
+
                             <Grid.Col span={6}>
                                 <NumberInput
-                                    label='MaxNumber of People'
-                                    placeholder='Max Number of People'
-                                    required
-                                    value={form.values.max_number_of_people}
-                                    {...form.getInputProps('max_number_of_people')}
-                                    onChange={(event) => form.setFieldValue('max_number_of_people', event || 0)}
-                                />
-                            </Grid.Col>
-                            <Grid.Col span={6}>
-                                <NumberInput
+                                    icon={<IconCashBanknote size={18} />}
                                     label='Adult Price'
                                     placeholder='Adult Price'
                                     required
@@ -138,16 +132,7 @@ const CreateOffer = () => {
                             </Grid.Col>
                             <Grid.Col span={6}>
                                 <NumberInput
-                                    label='Duration'
-                                    placeholder='Duration'
-                                    required
-                                    value={form.values.duration}
-                                    {...form.getInputProps('duration')}
-                                    onChange={(event) => form.setFieldValue('duration', event || 0)}
-                                />
-                            </Grid.Col>
-                            <Grid.Col span={6}>
-                                <NumberInput
+                                    icon={<IconCashBanknote size={18} />}
                                     label='Kid Price'
                                     placeholder='Kid Price'
                                     required
@@ -158,6 +143,19 @@ const CreateOffer = () => {
                             </Grid.Col>
                             <Grid.Col span={6}>
                                 <NumberInput
+                                    icon={<IconClock size={20} />}
+                                    label='Duration'
+                                    placeholder='Duration'
+                                    required
+                                    value={form.values.duration}
+                                    {...form.getInputProps('duration')}
+                                    onChange={(event) => form.setFieldValue('duration', event || 0)}
+                                />
+                            </Grid.Col>
+
+                            <Grid.Col span={6}>
+                                <NumberInput
+                                    icon={<IconUsers size={18} />}
                                     label='Max Number of People'
                                     placeholder='Max Number of People'
                                     required
@@ -208,19 +206,6 @@ const CreateOffer = () => {
                                     onChange={(event) => form.setFieldValue('endDate', event || new Date())}
                                 />
                             </Grid.Col>
-
-                            <Grid.Col span={6}>
-                                <NumberInput
-                                    label='Price'
-                                    placeholder='Price'
-                                    required
-                                    value={form.values.price}
-                                    {...form.getInputProps('price')}
-                                    onChange={(event) => form.setFieldValue('price', event || 0)}
-                                />
-                            </Grid.Col>
-
-
                             <Grid.Col span={12}>
                                 <Textarea
                                     label='Description'

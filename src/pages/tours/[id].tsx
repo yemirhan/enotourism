@@ -7,6 +7,7 @@ import { Calendar, TimeInput } from "@mantine/dates";
 import { showNotification } from '@mantine/notifications';
 import { IconChevronRight } from "@tabler/icons";
 import dayjs from 'dayjs';
+import Decimal from 'decimal.js';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React, { useState } from 'react'
@@ -47,9 +48,11 @@ const Tour = () => {
     const [kids, setKids] = useState(0)
     const rows = elements.map((element) => (
         <tr key={element.name}>
-            <td>{`${dayjs(tour?.offer.OfferTimeSlot?.[0]?.startDate).format("HH:mm")} - ${dayjs(tour?.offer.OfferTimeSlot?.[0]?.endDate).format("HH:mm")}`}</td>
-            <td>{`${tour?.offer.price} €`}</td>
-            <td>{tour?.offer.max_number_of_people}</td>
+            <td>{`${dayjs(tour?.startsAt).format("HH:mm")} - ${dayjs(tour?.endsAt).format("HH:mm")}`}</td>
+            {/* <td>{`${new Decimal(...tour?.offer.map(offer => offer.price))} €`}</td>
+            <td>{Math.max(...tour?.offer.map(offer => offer.adult_price as number))}</td> */}
+            <td></td>
+            <td></td>
         </tr>
     ));
     if (isLoading) {
@@ -69,7 +72,7 @@ const Tour = () => {
                                 {tour?.name}
                             </Title>
                             <Flex gap={"md"}>
-                                {(tour?.offer.offer_types || []).map(offer_type => {
+                                {(tour?.offer || []).flatMap(offer => offer.offer_types).map(offer_type => {
                                     return <Badge key={offer_type.id} >
                                         {offer_type.name}
                                     </Badge>
@@ -100,32 +103,36 @@ const Tour = () => {
                             <Title order={2}>
                                 Winery
                             </Title>
-                            <Paper withBorder p="lg">
-                                <Group position='apart'>
-                                    <Stack>
-                                        <Title>
-                                            {tour?.Winery?.name}
-                                        </Title>
-                                        <Flex direction={"row"} gap="sm">
-                                            <Badge >
-                                                {tour?.Winery?.country.name}
-                                            </Badge>
-                                            <Badge >
-                                                {`${tour?.Winery?._count.Wine} wines`}
-                                            </Badge>
-                                        </Flex>
-                                        <Text>
-                                            {tour?.Winery?.description}
-                                        </Text>
-                                    </Stack>
-                                    <Button
-                                        component={Link}
-                                        href={`/wineries/${tour?.Winery?.id}`}
-                                        variant='light'>
-                                        View Winery
-                                    </Button>
-                                </Group>
-                            </Paper>
+                            {
+                                tour?.Winery.map(winery => {
+                                    return <Paper key={winery.id} withBorder p="lg">
+                                        <Group position='apart'>
+                                            <Stack>
+                                                <Title>
+                                                    {winery.name}
+                                                </Title>
+                                                <Flex direction={"row"} gap="sm">
+                                                    <Badge >
+                                                        {winery.address?.country.name}
+                                                    </Badge>
+                                                    <Badge >
+                                                        {`${winery._count.Wine} wines`}
+                                                    </Badge>
+                                                </Flex>
+                                                <Text>
+                                                    {winery.description}
+                                                </Text>
+                                            </Stack>
+                                            <Button
+                                                component={Link}
+                                                href={`/wineries/${winery.id}`}
+                                                variant='light'>
+                                                View Winery
+                                            </Button>
+                                        </Group>
+                                    </Paper>
+                                })
+                            }
 
                         </Stack>
                     </Grid.Col>
@@ -133,9 +140,9 @@ const Tour = () => {
                         <Paper radius="md" p="xl" withBorder>
                             <Stack spacing={"sm"}>
                                 <Text>FROM</Text>
-                                <Title>{`${tour?.offer.adult_price} €`} </Title>
+                                {/* <Title>{`${tour?.offer.adult_price} €`} </Title> */}
                                 <Text>Per Person</Text>
-                                <Title order={2}>{`${tour?.offer.kid_price} €`} </Title>
+                                {/* <Title order={2}>{`${tour?.offer.kid_price} €`} </Title> */}
                                 <Text>Per Child</Text>
 
                                 <Text>Available Dates</Text>
@@ -157,7 +164,7 @@ const Tour = () => {
                                 <NumberInput
                                     placeholder="Number of Adults"
                                     label="Number of People"
-                                    max={(tour?.offer?.max_number_of_people || 0) - kids}
+                                    // max={(tour?.offer?.max_number_of_people || 0) - kids}
                                     value={people}
                                     onChange={(value) => setPeople(value || 1)}
                                     min={1}
@@ -166,7 +173,7 @@ const Tour = () => {
 
                                     placeholder="Number of Children"
                                     label="Number of Children"
-                                    max={(tour?.offer?.max_number_of_people || 0) - people}
+                                    // max={(tour?.offer?.max_number_of_people || 0) - people}
                                     value={kids}
                                     onChange={(value) => setKids(value || 0)}
                                     min={0}
@@ -183,7 +190,8 @@ const Tour = () => {
                                             number_of_people: people,
                                             number_of_kids: kids,
                                             tourId: router.query.id as string,
-                                            offerId: tour!.offer!.id
+                                            offerId: (tour?.offer || []).map(offer => offer.id)
+
                                         })
                                     }}
                                     fullWidth>

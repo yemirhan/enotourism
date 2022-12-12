@@ -36,7 +36,7 @@ export const Wineries = () => {
                                             </Title>
                                             <Group>
                                                 <Badge>
-                                                    {winery.country.name}
+                                                    {winery.address?.country.name}
                                                 </Badge>
                                             </Group>
                                             <Text lineClamp={3}>

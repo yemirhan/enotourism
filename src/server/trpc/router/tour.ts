@@ -8,9 +8,13 @@ export const tourRouter = router({
       include: {
         Winery: {
           include: {
-            country: {
-              select: {
-                name: true,
+            address: {
+              include: {
+                country: {
+                  select: {
+                    name: true,
+                  }
+                }
               }
             }
           }
@@ -33,8 +37,12 @@ export const tourRouter = router({
           },
           input.countryId.length > 0 ? {
             Winery: {
-              countryId: {
-                in: input.countryId
+              some: {
+                address: {
+                  countryId: {
+                    in: input.countryId
+                  }
+                }
               }
             }
           } : {}
@@ -43,9 +51,13 @@ export const tourRouter = router({
       include: {
         Winery: {
           include: {
-            country: {
-              select: {
-                name: true,
+            address: {
+              include: {
+                country: {
+                  select: {
+                    name: true,
+                  }
+                }
               }
             }
           }
@@ -67,6 +79,8 @@ export const tourRouter = router({
           name: true,
           description: true,
           number_of_people: true,
+          startsAt: true,
+          endsAt: true,
           Winery: {
             select: {
               name: true,
@@ -78,10 +92,14 @@ export const tourRouter = router({
                   id: true,
                 }
               },
-              country: {
+              address: {
                 select: {
-                  name: true,
-                  image: true,
+                  country: {
+                    select: {
+                      name: true,
+                      image: true,
+                    }
+                  },
                 }
               },
               description: true,

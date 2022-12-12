@@ -13,6 +13,7 @@ export const addressRoutes = router({
       create: {
         ...input,
         user_id: ctx.session.user.id,
+        
       }
     });
     return address;
@@ -30,6 +31,7 @@ export const addressRoutes = router({
         is_contact_address: true,
         postcode: true,
         country: true,
+        region: true,
       }
     });
     return address;

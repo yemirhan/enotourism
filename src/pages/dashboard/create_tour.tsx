@@ -48,6 +48,8 @@ const CreateTour = () => {
             startDate: new Date(),
             start_hour: 0,
             end_hour: 0,
+            endTime: new Date(),
+            startTime: new Date(),
         }
 
     })

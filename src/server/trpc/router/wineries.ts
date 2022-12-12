@@ -33,17 +33,22 @@ export const wineriesRouter = router({
             }
           },
           input.countryId ? {
-            countryId: input.countryId
-          } : {}
+            address: { country: { id: input.countryId } }
+          }
+            : {}
 
         ]
 
       },
       include: {
-        country: {
+        address: {
           select: {
-            name: true,
-            image: true,
+            country: {
+              select: {
+                name: true,
+                image: true,
+              }
+            },
           }
         },
         photos: {
@@ -90,14 +95,13 @@ export const wineriesRouter = router({
           address: {
             select: {
               address: true,
-              country: true,
-            }
-          },
-          country: {
-            select: {
-              name: true,
-              image: true,
-              emoji: true,
+              country: {
+                select: {
+                  name: true,
+                  image: true,
+                  emoji: true,
+                }
+              },
             }
           },
           Wine: {

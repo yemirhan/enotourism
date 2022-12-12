@@ -54,9 +54,11 @@ export const reservationRoutes = router({
       const reservations = await ctx.prisma.reservation.findMany({
         where: {
           offer: {
-            Tour: {
-              some: {
-                tourGuideId: ctx.session.user.id
+            some: {
+              Tour: {
+                some: {
+                  tourGuideId: ctx.session.user.id
+                }
               }
             }
           }
@@ -104,7 +106,7 @@ export const reservationRoutes = router({
   // })).query(async ({ctx, input}) => {
   //   return ctx.prisma.reservation.findMany({
   //     where: {
-        
+
   //     }
   //   })
   // })
@@ -112,7 +114,7 @@ export const reservationRoutes = router({
   reserve: protectedProcedure.input(z.object({
     tourId: z.string(),
     date: z.date(),
-    offerId: z.string(),
+    offerId: z.array(z.string()),
     number_of_people: z.number(),
     number_of_kids: z.number(),
     from_time: z.number(),
@@ -133,9 +135,9 @@ export const reservationRoutes = router({
           }
         },
         offer: {
-          connect: {
-            id: input.offerId,
-          }
+          connect: input.offerId.map(id => ({
+            id: id,
+          }))
         },
         slug: crypto.randomUUID(),
         number_of_kids: input.number_of_kids,

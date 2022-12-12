@@ -101,16 +101,22 @@ const UpdateProfile = () => {
                                     placeholder="+90 (530) 000 00 00" />
                             </Grid.Col>
                             <Grid.Col span={6}>
-                                <SegmentedControl
-                                    value={form.values.gender}
-                                    onChange={(e: UserGender) => form.setFieldValue('gender', e)}
-                                    data={[
-                                        { label: 'Male', value: 'MALE' },
-                                        { label: 'Female', value: 'FEMALE' },
-                                        { label: 'Other', value: 'OTHER' },
+                                <Stack spacing={0}>
+                                    <Text weight={500} size="sm">
+                                        Gender
+                                    </Text>
+                                    <SegmentedControl
+                                        fullWidth
+                                        value={form.values.gender}
+                                        onChange={(e: UserGender) => form.setFieldValue('gender', e)}
+                                        data={[
+                                            { label: 'Male', value: 'MALE' },
+                                            { label: 'Female', value: 'FEMALE' },
+                                            { label: 'Other', value: 'OTHER' },
 
-                                    ]}
-                                />
+                                        ]}
+                                    />
+                                </Stack>
                             </Grid.Col>
 
                             <Grid.Col span={12}>
@@ -123,7 +129,7 @@ const UpdateProfile = () => {
                                     placeholder="About" />
                             </Grid.Col>
 
-                            <Grid.Col span={6}>
+                            <Grid.Col span={12}>
                                 <Dropzone
                                     onDrop={async (files) => {
                                         const f = await files?.[0]?.arrayBuffer()

@@ -1,12 +1,12 @@
 import Layout from '@/components/layout/Layout'
 import { TourCarousel } from '@/components/tour/TourCarousel'
 import { trpc } from '@/utils/trpc'
-import { Anchor, Avatar, Badge, Breadcrumbs, Button, Container, Flex, Grid, Group, Image, NumberInput, Paper, Stack, Table, Text, Title } from '@mantine/core'
+import { Anchor, Avatar, Badge, Breadcrumbs, Button, Container, Flex, Grid, Group, Loader, NumberInput, Paper, Stack, Text, Title } from '@mantine/core'
 import { Calendar, TimeInput } from '@mantine/dates'
 import { showNotification } from '@mantine/notifications'
-import { Offer, OfferTimeSlot, OfferType } from '@prisma/client'
-import { IconBottle, IconBottleOff, IconChevronRight } from '@tabler/icons'
-import dayjs from 'dayjs'
+import type { Offer, OfferTimeSlot, OfferType } from '@prisma/client'
+import { IconBottleOff, IconChevronRight } from '@tabler/icons'
+
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import React, { useState } from 'react'
@@ -31,7 +31,13 @@ const Winery = () => {
     const [selectedOffer, setSelectedOffer] = useState<string | null>(null)
 
 
-    console.log(offers);
+    if (isLoading) {
+        return <Layout>
+            <Container>
+                <Loader />
+            </Container>
+        </Layout>
+    }
 
     return (
         <Layout>
@@ -175,6 +181,7 @@ const SelectedOffer = ({ offer }: {
         <Text>Available Dates</Text>
         <Calendar
             value={selectedDate}
+            minDate={offer.OfferTimeSlot?.[0]?.startDate}
             onChange={(value) => setSelectedDate(value || new Date())}
             fullWidth></Calendar>
 
@@ -208,7 +215,7 @@ const SelectedOffer = ({ offer }: {
                     to_time: (selectedTime.getHours() * 100) + selectedTime.getMinutes(),
                     number_of_people: people,
                     number_of_kids: kids,
-                    offerId: offer.id
+                    offerId: [offer.id]
                 })
             }}
             fullWidth>

@@ -58,7 +58,7 @@ const Tours = () => {
                     <SearchBar search={search} setSearch={setSearch} countryIds={countryIds} setCountryIds={setCountryIds} />
                     <SimpleGrid cols={3}>
                         {(tours || []).map(tour => {
-                            return <TourCard id={tour.id} key={tour.id} image={null} title={tour.name} description={tour.description} country={tour.Winery?.country.name || ""} badges={[]} />
+                            return <TourCard id={tour.id} key={tour.id} image={null} title={tour.name} description={tour.description} country={tour.Winery?.[0]?.address?.country.name || ""} badges={[]} />
                         })}
 
                     </SimpleGrid>

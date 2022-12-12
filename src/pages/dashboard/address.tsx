@@ -37,6 +37,7 @@ const Address = () => {
             is_contact_address: false,
             postcode: "",
             countryId: "",
+            regionId: ""
         },
     });
     useEffect(() => {

@@ -19,21 +19,21 @@ const Bookings = () => {
         }
     })
     const router = useRouter()
-    const rows = !(bookings instanceof TRPCError) ? (bookings || []).map((element) => (
-        <tr key={element.id}>
-            <td>{element.offer.Tour?.[0]?.name}</td>
-            <td>{element.from_time}</td>
-            <td>{dayjs(element.date).format("DD/MM/YYYY")}</td>
+    const rows = !(bookings instanceof TRPCError) ? (bookings || []).map((bookings) => (
+        <tr key={bookings.id}>
+            <td>{bookings.offer.map(offer => offer.name).join(", ")}</td>
+            <td>{bookings.from_time}</td>
+            <td>{dayjs(bookings.date).format("DD/MM/YYYY")}</td>
             <td>
                 <Flex direction={"row"} gap="sm" align={"center"} justify="center">
-                    <Avatar src={element.user.photo} size="sm" />
+                    <Avatar src={bookings.user.photo} size="sm" />
                     <Text>
-                        {element.user.name}
+                        {bookings.user.name}
                     </Text>
                 </Flex>
             </td>
             <td><Badge >
-                {element.status.status}</Badge></td>
+                {bookings.status.status}</Badge></td>
             <td>
                 <Flex direction={"row"} gap="sm">
 
@@ -41,7 +41,7 @@ const Bookings = () => {
                     <Button
                         onClick={() => {
                             updateStatus({
-                                id: element.status.id,
+                                id: bookings.status.id,
                                 status: "ACCEPTED"
                             })
                         }}
@@ -51,7 +51,7 @@ const Bookings = () => {
                     <Button
                         onClick={() => {
                             updateStatus({
-                                id: element.status.id,
+                                id: bookings.status.id,
                                 status: "REJECTED"
                             })
                         }}

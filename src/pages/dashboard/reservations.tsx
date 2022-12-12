@@ -10,19 +10,19 @@ const Reservations = () => {
     const { data: reservations, isLoading, isError } = trpc.reservations.getReservationsOfUser.useQuery()
     console.log(reservations);
     const router = useRouter()
-    const rows = !(reservations instanceof TRPCError) ? (reservations || []).map((element) => (
-        <tr key={element.id}>
-            <td>{element.offer.Tour?.[0]?.name}</td>
-            <td>{element.from_time}</td>
-            <td>{dayjs(element.date).format("DD/MM/YYYY")}</td>
+    const rows = !(reservations instanceof TRPCError) ? (reservations || []).map((reservation) => (
+        <tr key={reservation.id}>
+            <td>{reservation.offer.length}</td>
+            <td>{reservation.from_time}</td>
+            <td>{dayjs(reservation.date).format("DD/MM/YYYY")}</td>
             <td><Badge >
-                {element.status.status}</Badge></td>
+                {reservation.status.status}</Badge></td>
             <td><Button
                 onClick={() => {
-                    router.push("/tours/" + element.offer.Tour[0]?.id)
+                    router.push("/guides/" + reservation.tourGuideId)
                 }}
             >
-                Cancel
+                Guide
             </Button></td>
         </tr>
     )) : null;

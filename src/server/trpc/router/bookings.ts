@@ -38,7 +38,7 @@ export const bookingRoutes = router({
           date: input.date,
           from_time: input.from_time,
           number_of_people: input.number_of_people,
-          offerId: input.tourId,
+
           number_of_kids: 0,
           to_time: input.to_time,
           slug: "test",

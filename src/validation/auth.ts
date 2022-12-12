@@ -30,7 +30,20 @@ export const createWinerySchema = z.object({
   email: z.string(),
   history: z.string(),
   awards: z.string(),
-  wines: z.array(wines)
+  wines: z.array(wines),
+  address: z.object({
+    countryId: z.string(),
+    regionId: z.string(),
+    city: z.string(),
+
+    street: z.string(),
+    flat: z.string(),
+  }),
+  workingHours: z.array(z.object({
+    close: z.date(),
+    day: z.date(),
+    open: z.date()
+  }))
 })
 export type ILogin = z.infer<typeof loginSchema>;
 export type IRegister = z.infer<typeof registerSchema>;

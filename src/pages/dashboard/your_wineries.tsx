@@ -99,6 +99,14 @@ const AddWineryModal = ({ opened, close }: { opened: boolean, close: () => void 
             awards: "",
             wines: [],
             photos: [],
+            address: {
+                city: "",
+                countryId: "",
+                flat: "",
+                regionId: "",
+                street: ""
+            },
+            workingHours: []
         },
         validate: {
             email: (val) => (/^\S+@\S+$/.test(val) ? null : 'Invalid email'),
