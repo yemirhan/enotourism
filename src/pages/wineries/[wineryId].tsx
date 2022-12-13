@@ -30,7 +30,7 @@ const Winery = () => {
     })
     const { data: offers } = trpc.offer.getWineryOffers.useQuery({ wineryId: query.wineryId as string }, { enabled: isReady })
     const [selectedOffer, setSelectedOffer] = useState<string | null>(null)
-
+    const [selectedDate, setSelectedDate] = useState<Date | null>(new Date())
 
     if (isLoading) {
         return <Layout>
@@ -52,7 +52,7 @@ const Winery = () => {
                                 {data?.name}
                             </Title>
                             <Text>
-                                {data?.description} Lorem ipsum dolor sit amet, consectetur adipisicing elit. Laboriosam obcaecati, veniam rerum hic dolorem ut, quae numquam quam, tempore incidunt nam modi sed magni aut! Laborum optio soluta voluptatibus impedit.
+                                {data?.description}
                             </Text>
                             <Title order={2}>
                                 Awards
@@ -115,7 +115,32 @@ const Winery = () => {
                                 </Text>
                             </Stack>
                         </Paper>
-                        {(offers || []).map(offer => {
+
+                        <Paper withBorder p={"xl"} mt="md" >
+                            <Title order={3}>
+                                Available Dates
+                            </Title>
+                            <Calendar
+                                mt={"md"}
+                                renderDay={(date) => {
+                                    const day = date.getDate();
+                                    const a = date.getDay();
+                                    return (
+                                        <Tooltip label={data?.WorkingHours.find(wd => wd.day === a) ? `Opens: ${dayjs(data?.WorkingHours.find(wd => wd.day === a)?.open).format("HH:mm")}, Closes: ${dayjs(data?.WorkingHours.find(wd => wd.day === a)?.close).format("HH:mm")}` : ""} withArrow>
+                                            <Indicator label={(offers || [])?.filter(offer => offer.OfferTimeSlot?.[0]?.startDate.getDate() === day).length.toString()} color="orange" offset={8} position="bottom-center" disabled={(offers || [])?.filter(offer => offer.OfferTimeSlot?.[0]?.startDate.getDate() === day).length === 0}>
+
+                                                <div>{day}</div>
+                                            </Indicator>
+                                        </Tooltip>
+                                    );
+                                }}
+                                onChange={setSelectedDate}
+                                value={selectedDate}
+                                excludeDate={date => !((data?.WorkingHours || []).map(wh => wh.day).includes(date.getDay()))}
+                                fullWidth
+                            />
+                        </Paper>
+                        {selectedDate !== null ? (offers || []).filter(offer => offer.OfferTimeSlot?.[0]?.startDate.getDate() === selectedDate?.getDate()).map(offer => {
                             return <Paper withBorder p={"xl"} mt="md" key={offer.id}>
                                 <Stack>
                                     <Title order={3}>
@@ -133,29 +158,7 @@ const Winery = () => {
                                     </Button>
                                 </Stack>
                             </Paper>
-                        })}
-                        <Paper withBorder p={"xl"} mt="md" >
-                            <Title order={3}>
-                                Available Dates
-                            </Title>
-                            <Calendar
-                                mt={"md"}
-                                renderDay={(date) => {
-                                    const day = date.getDate();
-                                    const a = date.getDay();
-                                    return (
-                                        <Tooltip label={data?.WorkingHours.find(wd => wd.day === a) ? `Opens: ${dayjs(data?.WorkingHours.find(wd => wd.day === a)?.open).format("HH:mm")}, Closes: ${dayjs(data?.WorkingHours.find(wd => wd.day === a)?.close).format("HH:mm")}` : ""} withArrow>
-                                            <Indicator label="1" color="red" offset={8} position="bottom-center" disabled={true}>
-                                                {/* offers?.map(offer => offer.OfferTimeSlot?.[0]?.startDate) */}
-                                                <div>{day}</div>
-                                            </Indicator>
-                                        </Tooltip>
-                                    );
-                                }}
-                                excludeDate={date => !((data?.WorkingHours || []).map(wh => wh.day).includes(date.getDay()))}
-                                fullWidth
-                            />
-                        </Paper>
+                        }) : null}
                         {
                             selectedOffer !== null ? <Paper withBorder p={"xl"} mt="md">
                                 <SelectedOffer offer={(offers || [])?.find(offer => offer.id === selectedOffer)} />
@@ -200,15 +203,6 @@ const SelectedOffer = ({ offer }: {
         <Text>Per Person</Text>
         <Title order={2}>{`${offer.kid_price} €`} </Title>
         <Text>Per Child</Text>
-
-        <Text>Available Dates</Text>
-        <Calendar
-            value={selectedDate}
-            minDate={offer.OfferTimeSlot?.[0]?.startDate}
-            onChange={(value) => setSelectedDate(value || new Date())}
-            fullWidth></Calendar>
-
-        <TimeInput value={selectedTime} onChange={(value) => setSelectedTime(value)} label="Time of Visit" />
         <NumberInput
             placeholder="Number of Adults"
             label="Number of People"
@@ -226,6 +220,16 @@ const SelectedOffer = ({ offer }: {
             onChange={(value) => setKids(value || 0)}
             min={0}
         />
+        <Flex direction={"column"}>
+            <Title order={3}>
+                Offer
+            </Title>
+            <Group>
+                <Badge>
+                    {offer.offer_types.map(offerType => offerType.name).join(", ")}
+                </Badge>
+            </Group>
+        </Flex>
         {/* <Text>
         {`Total: ${tour?.offer?.adult_price?.mul(people) + ((tour?.offer?.kid_price?.toNumber() || 0) * kids)} €`}
     </Text> */}
@@ -233,7 +237,6 @@ const SelectedOffer = ({ offer }: {
             onClick={() => {
                 reserve({
                     date: selectedDate,
-                    tourId: "",
                     from_time: (selectedTime.getHours() * 100) + selectedTime.getMinutes(),
                     to_time: (selectedTime.getHours() * 100) + selectedTime.getMinutes(),
                     number_of_people: people,
