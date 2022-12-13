@@ -2,7 +2,7 @@ import Layout from '@/components/layout/Layout'
 import { TourCarousel } from '@/components/tour/TourCarousel';
 import { TourTabs } from '@/components/tour/TourTabs';
 import { trpc } from '@/utils/trpc';
-import { Anchor, Avatar, Badge, Breadcrumbs, Button, Container, Flex, Grid, Group, Loader, NumberInput, Paper, Stack, Table, Text, Title } from "@mantine/core"
+import { Anchor, Avatar, Badge, Breadcrumbs, Button, Container, Flex, Grid, Group, Loader, NumberInput, Paper, Stack, Table, Text, Title, useMantineTheme } from "@mantine/core"
 import { Calendar, TimeInput } from "@mantine/dates";
 import { showNotification } from '@mantine/notifications';
 import { IconChevronRight } from "@tabler/icons";
@@ -32,6 +32,7 @@ const Tour = () => {
     }, {
         enabled: router.isReady
     })
+    const theme = useMantineTheme()
     const { mutate: reserve } = trpc.reservations.reserve.useMutation({
         onSuccess: () => {
             showNotification({
@@ -48,9 +49,9 @@ const Tour = () => {
     const [kids, setKids] = useState(0)
     const rows = elements.map((element) => (
         <tr key={element.name}>
-            <td>{`${dayjs(tour?.startsAt).format("HH:mm")} - ${dayjs(tour?.endsAt).format("HH:mm")}`}</td>
-            {/* <td>{`${new Decimal(...tour?.offer.map(offer => offer.price))} €`}</td>
-            <td>{Math.max(...tour?.offer.map(offer => offer.adult_price as number))}</td> */}
+            <td>{`${dayjs(tour?.startTime).format("HH:mm")}`}</td>
+            <td>{`${tour?.if_selected_all} €`}</td>
+            <td>{tour?.max_number_of_people}</td>
             <td></td>
             <td></td>
         </tr>
@@ -67,14 +68,14 @@ const Tour = () => {
                     <Grid.Col span={8}>
                         <Stack spacing={"lg"}>
                             <Breadcrumbs separator={<IconChevronRight size={18} />}>{items(tour?.name, tour?.id)}</Breadcrumbs>
-                            <TourCarousel />
+                            <TourCarousel data={tour?.photos.map(photo => photo.url)} />
                             <Title>
                                 {tour?.name}
                             </Title>
                             <Flex gap={"md"}>
-                                {(tour?.offer || []).flatMap(offer => offer.offer_types).map(offer_type => {
-                                    return <Badge key={offer_type.id} >
-                                        {offer_type.name}
+                                {(tour?.TourActivities || []).map(activity => {
+                                    return <Badge key={activity.id} >
+                                        {activity.activity}
                                     </Badge>
                                 })}
                             </Flex>
@@ -140,27 +141,32 @@ const Tour = () => {
                         <Paper radius="md" p="xl" withBorder>
                             <Stack spacing={"sm"}>
                                 <Text>FROM</Text>
-                                {/* <Title>{`${tour?.offer.adult_price} €`} </Title> */}
+                                <Title>{`${tour?.price_per_adult} €`} </Title>
                                 <Text>Per Person</Text>
-                                {/* <Title order={2}>{`${tour?.offer.kid_price} €`} </Title> */}
+                                <Title order={2}>{`${tour?.price_per_kid} €`} </Title>
                                 <Text>Per Child</Text>
 
                                 <Text>Available Dates</Text>
                                 <Calendar
-                                    value={selectedDate}
-                                    onChange={(value) => setSelectedDate(value || new Date())}
-                                    fullWidth></Calendar>
+                                    initialMonth={new Date(2021, 7)}
+                                    onChange={() => console.log()}
+                                    fullWidth
+                                    dayStyle={(date) =>
+                                        (tour?.startDate.getDate() === date.getDate()) || (tour?.endDate.getDate() === date.getDate())
+                                            ? { backgroundColor: theme.colors.red[9], color: theme.white }
+                                            : {}
+                                    }
+                                />
                                 <Table>
                                     <thead>
                                         <tr>
-                                            <th>Opening Hours</th>
-                                            <th>Price</th>
+                                            <th>Tour Starts at</th>
+                                            <th>Price Full Slot</th>
                                             <th>Open Slots</th>
                                         </tr>
                                     </thead>
                                     <tbody>{rows}</tbody>
                                 </Table>
-                                <TimeInput value={selectedTime} onChange={(value) => setSelectedTime(value)} label="Time of Visit" />
                                 <NumberInput
                                     placeholder="Number of Adults"
                                     label="Number of People"
@@ -190,8 +196,9 @@ const Tour = () => {
                                             number_of_people: people,
                                             number_of_kids: kids,
                                             tourId: router.query.id as string,
-                                            offerId: (tour?.offer || []).map(offer => offer.id)
-
+                                            offerId: [],
+                                            guide_id: tour?.tour_guide.id,
+                                            
                                         })
                                     }}
                                     fullWidth>

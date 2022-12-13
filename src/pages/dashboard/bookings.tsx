@@ -21,7 +21,7 @@ const Bookings = () => {
     const router = useRouter()
     const rows = !(bookings instanceof TRPCError) ? (bookings || []).map((bookings) => (
         <tr key={bookings.id}>
-            <td>{bookings.offer.map(offer => offer.name).join(", ")}</td>
+            <td>{bookings.tourId}</td>
             <td>{bookings.from_time}</td>
             <td>{dayjs(bookings.date).format("DD/MM/YYYY")}</td>
             <td>

@@ -18,7 +18,7 @@ const Tours = () => {
                 <UserToursList data={(tours || []).map(tour => ({
                     name: tour.name,
                     description: tour.description,
-                    number_of_people: tour.number_of_people
+                    number_of_people: tour.max_number_of_people
                 }))} />
             </Container>
         </ProtectedLayout>

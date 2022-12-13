@@ -4,10 +4,24 @@ import { router, publicProcedure } from "../trpc";
 
 export const guideRouter = router({
     getGuides: publicProcedure
-        .query(async ({ ctx }) => {
+        .input(z.object({
+            name: z.string().optional(),
+            countryId: z.string().optional(),
+        }))
+        .query(async ({ ctx, input }) => {
             const guides = await ctx.prisma.user.findMany({
                 where: {
                     user_type: "GUIDE",
+                    AND: [
+                        input.name ? {
+                            name: {
+                                contains: input.name
+                            },
+                        } : {},
+                        input.countryId ? {
+                            address: { country: { id: input.countryId } }
+                        } : {},
+                    ],
                 },
                 select: {
                     id: true,
@@ -59,7 +73,7 @@ export const guideRouter = router({
                     select: {
                         description: true,
                         name: true,
-                        number_of_people: true,
+                        max_number_of_people: true,
                         id: true,
                     }
                 }

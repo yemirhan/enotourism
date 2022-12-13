@@ -78,9 +78,28 @@ export const tourRouter = router({
           id: true,
           name: true,
           description: true,
-          number_of_people: true,
-          startsAt: true,
-          endsAt: true,
+          max_number_of_people: true,
+          startDate: true,
+          endDate: true,
+          startTime: true,
+          address: true,
+          photos: true,
+          if_selected_all: true,
+          _count: {
+            select: {
+              photos: true,
+              Winery: true,
+            }
+          },
+          price_per_kid: true,
+          price_per_adult: true,
+
+          TourActivities: {
+            select: {
+              activity: true,
+              id: true,
+            }
+          },
           Winery: {
             select: {
               name: true,
@@ -125,7 +144,7 @@ export const tourRouter = router({
                   id: true,
                   name: true,
                   description: true,
-                  number_of_people: true,
+                  max_number_of_people: true,
 
                   Winery: {
                     select: {
@@ -149,23 +168,7 @@ export const tourRouter = router({
               }
             }
           },
-          offer: {
-            select: {
-              id: true,
-              adult_price: true,
-              kid_price: true,
-              max_number_of_people: true,
-              offer_types: true,
-              price: true,
-              duration: true,
-              OfferTimeSlot: {
-                select: {
-                  startDate: true,
-                  endDate: true,
-                }
-              }
-            }
-          }
+
         }
       });
       return tour;

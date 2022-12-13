@@ -21,14 +21,14 @@ export const publicProcedure = t.procedure;
  * Reusable middleware to ensure
  * users are logged in
  */
-const isAuthed = t.middleware(({ ctx, next }) => {
-  if (!ctx.session || !ctx.session.user) {
-    throw new TRPCError({ code: "UNAUTHORIZED" });
+const isAuthed = t.middleware(({ ctx, next }) => { // bu satırda protected procedure'ları kullanabilmek için gerekli
+  if (!ctx.session || !ctx.session.user) { // burada session kontrolü yapılıyor
+    throw new TRPCError({ code: "UNAUTHORIZED" }); // eğer session yoksa hata döndürüyor
   }
-  return next({
+  return next({ // eğer session varsa next() ile bir sonraki middleware'e geçiyor
     ctx: {
       // infers the `session` as non-nullable
-      session: { ...ctx.session, user: ctx.session.user },
+      session: { ...ctx.session, user: ctx.session.user }, // burada session kontrolü yapıldıktan sonra session bilgileri döndürülüyor
     },
   });
 });
@@ -36,4 +36,4 @@ const isAuthed = t.middleware(({ ctx, next }) => {
 /**
  * Protected procedure
  **/
-export const protectedProcedure = t.procedure.use(isAuthed);
+export const protectedProcedure = t.procedure.use(isAuthed); // bu satırda trpc middleware'ı kullanılarak protected procedure'lar oluşturuluyor

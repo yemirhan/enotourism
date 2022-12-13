@@ -1,7 +1,9 @@
 import { GuideCard } from "@/components/guides/GuideCard"
+import { GuideSearch } from "@/components/guides/GuideSearch"
 import Layout from "@/components/layout/Layout"
 import { trpc } from "@/utils/trpc"
 import { Container, SimpleGrid, Stack, Title } from "@mantine/core"
+import { useState } from "react"
 
 
 const data = {
@@ -17,7 +19,12 @@ const data = {
 }
 
 const Guides = () => {
-    const { data: guides } = trpc.guides.getGuides.useQuery()
+    const [name, setName] = useState("")
+    const [countryId, setCountryId] = useState("")
+    const { data: guides } = trpc.guides.getGuides.useQuery({
+        name,
+        countryId
+    })
     return (
         <Layout>
             <Container size={"xl"}>
@@ -25,6 +32,7 @@ const Guides = () => {
                     <Title>
                         Guides
                     </Title>
+                    <GuideSearch search={name} setSearch={setName} setCountryId={setCountryId} />
                     <SimpleGrid cols={4}>
                         {guides?.map((guide) => {
                             return <GuideCard key={guide.id}

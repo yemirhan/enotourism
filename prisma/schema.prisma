@@ -225,9 +225,10 @@ model Address {
   region             Region? @relation(fields: [regionId], references: [id])
   regionId           String? @unique
 
-  user_id String   @unique
-  user    User     @relation(fields: [user_id], references: [id])
+  user_id String?  @unique
+  user    User?    @relation(fields: [user_id], references: [id])
   Winery  Winery[]
+  Tour    Tour[]
 
   @@index([countryId], name: "countryId")
 }
@@ -304,18 +305,45 @@ model WorkingHours {
 }
 
 model Tour {
-  id               String   @id @default(cuid())
-  name             String
-  description      String
-  number_of_people Int
-  startsAt         DateTime
-  endsAt           DateTime
-  Winery           Winery[]
-  tour_guide       User     @relation(fields: [tourGuideId], references: [id])
-  tourGuideId      String
-  offer            Offer[]
+  id                   String           @id @default(cuid())
+  name                 String
+  description          String
+  address              Address?         @relation(fields: [addressId], references: [id])
+  addressId            String?
+  startTime            DateTime         @db.Time()
+  startDate            DateTime
+  endDate              DateTime
+  price_per_adult      Int
+  price_per_kid        Int
+  max_number_of_people Int
+  if_selected_all      Int
+  photos               TourPhoto[]
+  Winery               Winery[]
+  tour_guide           User             @relation(fields: [tourGuideId], references: [id])
+  tourGuideId          String
+  TourActivities       TourActivities[]
+  Reservation          Reservation[]
 
   @@index([tourGuideId])
+  @@index([addressId])
+}
+
+model TourActivities {
+  id       String        @id @default(cuid())
+  tourId   String
+  tour     Tour          @relation(fields: [tourId], references: [id])
+  activity OfferTypeEnum
+
+  @@index([tourId])
+}
+
+model TourPhoto {
+  id     String @id @default(cuid())
+  tourId String
+  tour   Tour   @relation(fields: [tourId], references: [id])
+  url    String
+
+  @@index([tourId])
 }
 
 model Wine {
@@ -328,6 +356,8 @@ model Wine {
   texture           WineTypes
   Winery            Winery?      @relation(fields: [wineryId], references: [id])
   wineryId          String?
+
+  @@index([wineryId])
 }
 
 model Offer {
@@ -341,11 +371,12 @@ model Offer {
   kid_price            Decimal
   photos               OfferPhoto[]
   max_number_of_people Int
-  duration             Int
+  duration             Float
   wineryId             String?
   OfferTimeSlot        OfferTimeSlot[]
   Reservation          Reservation[]
-  Tour                 Tour[]
+
+  @@index([wineryId])
 }
 
 model OfferPhoto {
@@ -363,12 +394,11 @@ enum OfferTypeEnum {
   EXTRAACTIVITIES @map("Extra Activities")
   ACCOMODATION    @map("Accomodation")
   RESTAURANT      @map("Restaurant")
-  CHEESE         @map("Cheese")
-  WINEMAKING     @map("Winemaking")
-  WORKSHOPS     @map("Workshops")
-  SIGHTSEEING   @map("Sightseeing")
-  WINELECTURE   @map("Wine Lecture")
-  
+  CHEESE          @map("Cheese")
+  WINEMAKING      @map("Winemaking")
+  WORKSHOPS       @map("Workshops")
+  SIGHTSEEING     @map("Sightseeing")
+  WINELECTURE     @map("Wine Lecture")
 }
 
 model OfferType {
@@ -416,6 +446,8 @@ model GuideTimeSlots {
   endTime   Int
   guideId   String
   guide     User   @relation(fields: [guideId], references: [id])
+
+  @@index([guideId])
 }
 
 model Status {
@@ -441,4 +473,10 @@ model Reservation {
   updatedAt        DateTime @updatedAt
   withTourGuide    Boolean  @default(false)
   tourGuideId      String?
+  tour             Tour?    @relation(fields: [tourId], references: [id])
+  tourId           String?
+
+  @@index([userId])
+  @@index([statusId])
+  @@index([tourId])
 }

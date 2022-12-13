@@ -12,24 +12,55 @@ export const reservationRoutes = router({
         },
         include: {
 
-          offer: {
-            include: {
-              Tour: {
+          tour: {
+            select: {
+              name: true,
+              address: true,
+              startDate: true,
+              startTime: true,
+              endDate: true,
+              price_per_adult: true,
+              price_per_kid: true,
+              TourActivities: {
                 select: {
-                  name: true,
+                  activity: true,
                   id: true,
-
                 }
               },
-              offer_types: true,
+              Winery: {
+                select: {
+                  id: true,
+                  name: true,
+                  description: true,
+                }
+              },
+
+            }
+          },
+          offer: {
+            select: {
+              id: true,
+              adult_price: true,
+              kid_price: true,
+              name: true,
               OfferTimeSlot: {
                 select: {
                   startDate: true,
                   endDate: true,
+                  startTime: true,
+                  endTime: true,
                   id: true,
                 }
               },
-
+              description: true,
+              duration: true,
+              winery: {
+                select: {
+                  name: true,
+                  id: true,
+                  description: true,
+                }
+              }
             }
           },
           status: {
@@ -53,15 +84,7 @@ export const reservationRoutes = router({
     if (ctx.session.user.user_type === "GUIDE") {
       const reservations = await ctx.prisma.reservation.findMany({
         where: {
-          offer: {
-            some: {
-              Tour: {
-                some: {
-                  tourGuideId: ctx.session.user.id
-                }
-              }
-            }
-          }
+          tourGuideId: ctx.session.user.id
         },
         include: {
           user: {
@@ -72,24 +95,7 @@ export const reservationRoutes = router({
               email: true
             }
           },
-          offer: {
-            include: {
-              offer_types: true,
-              Tour: {
-                select: {
-                  name: true
-                }
-              },
-              OfferTimeSlot: {
-                select: {
-                  startDate: true,
-                  endDate: true,
-                  id: true,
-                }
-              },
 
-            }
-          },
           status: {
             select: {
               id: true,
@@ -112,8 +118,9 @@ export const reservationRoutes = router({
   // })
 
   reserve: protectedProcedure.input(z.object({
-    tourId: z.string(),
+    tourId: z.string().nullish(),
     date: z.date(),
+    guide_id: z.string().nullish(),
     offerId: z.array(z.string()),
     number_of_people: z.number(),
     number_of_kids: z.number(),
@@ -149,7 +156,14 @@ export const reservationRoutes = router({
         },
         from_time: input.from_time,
         to_time: input.to_time,
-
+        ...(input.tourId && ({
+          tour: {
+            connect: {
+              id: input.tourId,
+            }
+          }
+        })),
+        tourGuideId: input.guide_id,
         number_of_people: input.number_of_people,
       }
     });

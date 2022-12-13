@@ -2,6 +2,7 @@ import Layout from '@/components/layout/Layout'
 import { WinerySearch } from '@/components/wineries/WinerySearch'
 import { trpc } from '@/utils/trpc'
 import { Badge, Button, Container, Grid, Group, Image, Paper, Stack, Text, Title } from '@mantine/core'
+import { OfferTypeEnum, WineTypes } from '@prisma/client'
 import { IconPhoto } from '@tabler/icons'
 
 import Link from 'next/link'
@@ -11,19 +12,23 @@ import React, { useState } from 'react'
 export const Wineries = () => {
     const [search, setSearch] = useState("")
     const [countryId, setCountryId] = useState("")
+    const [typeOfWine, setTypeOfWine] = useState<WineTypes | null>(null)
+    const [activities, setActivities] = useState<OfferTypeEnum[]>([])
     const { data: wineries, isLoading } = trpc.wineries.searchWineries.useQuery({
         name: search,
-        countryId: countryId.length > 0 ? countryId : undefined
+        countryId: countryId.length > 0 ? countryId : undefined,
+        typeOfWine: typeOfWine,
+        activities: activities.length > 0 ? activities : undefined
     })
 
     return (
         <Layout>
-            <Container>
+            <Container size={"xl"}>
                 <Stack spacing={"lg"}>
                     <Title>
                         Wineries
                     </Title>
-                    <WinerySearch search={search} setSearch={setSearch} setCountryId={setCountryId} />
+                    <WinerySearch search={search} setSearch={setSearch} setActivities={setActivities} setTypeOfWine={setTypeOfWine} setCountryId={setCountryId} />
                     <Grid>
                         {
                             (wineries || []).map(winery => (

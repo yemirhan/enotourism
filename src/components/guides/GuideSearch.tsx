@@ -68,24 +68,20 @@ const data = [
 ]
 
 
-export const WinerySearch = ({
+export const GuideSearch = ({
     search,
     setSearch,
     setCountryId,
-    setTypeOfWine,
-    setActivities
 }: {
     search: string
     setSearch: (search: string) => void
     setCountryId: (countryId: string) => void,
-    setTypeOfWine: (typeOfWine: WineTypes) => void
-    setActivities: (activities: OfferTypeEnum[]) => void
 }) => {
     const { data: countries } = trpc.countries.getCountries.useQuery()
     return (
         <Paper withBorder p={"md"} >
             <Group grow spacing={"lg"}>
-                <TextInput value={search} onChange={(e) => setSearch(e.target.value)} placeholder='Where do you want to go?' icon={<IconSearch size={18} />} />
+                <TextInput value={search} onChange={(e) => setSearch(e.target.value)} placeholder='Guide Name' icon={<IconSearch size={18} />} />
                 <Select
                     data={(countries || []).map(country => ({ value: country.id, label: country.name }))}
                     searchable
@@ -93,21 +89,6 @@ export const WinerySearch = ({
                     placeholder="Location"
                     onChange={(e) => setCountryId(e || "")}
                 />
-                <Select
-                    data={Object.values(WineTypes).map(type => ({ value: type, label: type }))}
-                    searchable
-                    icon={<IconActivity size={18} />}
-                    placeholder="Type of wine"
-                    onChange={(e: WineTypes) => setTypeOfWine(e)}
-                />
-                <MultiSelect
-                    data={Object.values(OfferTypeEnum).map(type => ({ value: type, label: type }))}
-                    searchable
-                    icon={<IconActivity size={18} />}
-                    placeholder="Activities"
-                    onChange={(e: OfferTypeEnum[]) => setActivities(e)}
-                />
-
                 <Button leftIcon={<IconSearch size={18} />}>
                     Search
                 </Button>

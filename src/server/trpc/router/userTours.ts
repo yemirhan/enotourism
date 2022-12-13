@@ -3,24 +3,24 @@ import { z } from "zod";
 import { router, protectedProcedure } from "../trpc";
 
 const createTourInput = z.object({
-  name: z.string(),
   description: z.string(),
+  name: z.string(),
   number_of_people: z.number(),
-  offerTypes: z.array(z.nativeEnum(OfferTypeEnum)),
-  wineryId: z.string(),
-  price: z.number(),
-  adult_price: z.number(),
-  offer_description: z.string(),
-  duration: z.number(),
-  kid_price: z.number(),
-  offer_name: z.string(),
-  max_number_of_people: z.number(),
   startDate: z.date(),
   endDate: z.date(),
-  start_hour: z.number(),
-  end_hour: z.number(),
   startTime: z.date(),
-  endTime: z.date()
+  selected_all_price: z.number(),
+  adult_price: z.number(),
+  kid_price: z.number(),
+  photos: z.array(z.string()),
+  wineryIds: z.array(z.string()),
+  activities: z.array(z.nativeEnum(OfferTypeEnum)),
+  address: z.object({
+    city: z.string(),
+    countryId: z.string(),
+    street: z.string(),
+    flat: z.string(),
+  })
 })
 export type CreateTourInput = z.infer<typeof createTourInput>
 
@@ -45,46 +45,47 @@ export const userToursRoutes = router({
 
         description: input.description,
         name: input.name,
-        number_of_people: input.number_of_people,
-        startsAt: input.startTime,
-        endsAt: input.endTime,
-        offer: {
-          create: {
-            offer_types: {
-              createMany: {
-                data: [...input.offerTypes].map(offerType => ({
-                  name: offerType
-                }))
-              },
-            },
-            OfferTimeSlot: {
-              create: {
-                endTime: input.endTime,
-                startTime: input.startTime,
-                startDate: input.startDate,
-                endDate: input.endDate,
+        max_number_of_people: input.number_of_people,
+        startDate: input.startDate,
+        endDate: input.endDate,
+        startTime: input.startTime,
+        if_selected_all: input.selected_all_price,
+        price_per_adult: input.adult_price,
+        price_per_kid: input.kid_price,
+        TourActivities: {
+          createMany: {
+            data: input.activities.map(activity => ({
 
-              }
-            },
-            price: input.price,
-            adult_price: input.adult_price,
-            description: input.offer_description,
-            duration: input.duration,
-            kid_price: input.kid_price,
-            name: input.offer_name,
-            max_number_of_people: input.max_number_of_people,
-            winery: {
-              connect: {
-                id: input.wineryId,
-              }
-            }
-          },
-        },
-
-        Winery: {
-          connect: {
-            id: input.wineryId,
+              activity: activity
+            }))
           }
+        },
+        address: {
+          create: {
+            address: "",
+            city: input.address.city,
+            country: {
+              connect: {
+                id: input.address.countryId
+              }
+            },
+            street: input.address.street,
+            flat: input.address.flat,
+          }
+        },
+        photos: {
+          createMany: {
+            data: input.photos.map(photo => ({
+              url: photo
+            }))
+          }
+        },
+        Winery: {
+          connect: [
+            ...input.wineryIds.map(wineryId => ({
+              id: wineryId
+            }))
+          ]
         }
       },
 

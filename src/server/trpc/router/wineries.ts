@@ -1,3 +1,4 @@
+import { OfferTypeEnum, WineTypes } from "@prisma/client";
 import { z } from "zod";
 
 import { router, publicProcedure } from "../trpc";
@@ -23,6 +24,9 @@ export const wineriesRouter = router({
   searchWineries: publicProcedure.input(z.object({
     name: z.string(),
     countryId: z.string().optional(),
+    typeOfWine: z.nativeEnum(WineTypes).nullable().optional(),
+    activities: z.array(z.nativeEnum(OfferTypeEnum)).optional(),
+
   })).query(async ({ ctx, input }) => {
     return await ctx.prisma.winery.findMany({
       where: {
@@ -35,9 +39,32 @@ export const wineriesRouter = router({
           input.countryId ? {
             address: { country: { id: input.countryId } }
           }
-            : {}
+            : {},
+          (input?.activities || []).length > 0 ? {
+            Offer: {
+              some: {
+                offer_types: {
+                  some: {
+                    name: {
+                      in: input.activities,
+                    }
+                  }
+                }
+              }
+            }
+          } : {},
+          input.typeOfWine ? {
+            Wine: {
+              some: {
+                texture: {
+                  equals: input.typeOfWine,
+                }
+              }
+            }
+          } : {},
 
-        ]
+        ],
+
 
       },
       include: {
