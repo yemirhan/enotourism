@@ -1,5 +1,7 @@
+import { TourTypes } from '@/pages/dashboard/create_tour';
 import { trpc } from '@/utils/trpc';
 import { Button, Group, MultiSelect, Paper, TextInput } from '@mantine/core'
+import { OfferTypeEnum } from '@prisma/client';
 import { IconActivity, IconMapPin, IconSearch } from '@tabler/icons'
 import React from 'react'
 const data = [
@@ -97,9 +99,20 @@ export const SearchBar = ({
                     placeholder="Location"
                 />
                 <MultiSelect
-                    data={data2}
                     icon={<IconActivity size={18} />}
                     placeholder="Activities"
+                    required
+                    data={
+                        (Object.entries(OfferTypeEnum)).map((tourType, k) => {
+                            return {
+                                label: TourTypes[tourType[1]],
+                                value: tourType[1],
+                            }
+                        })
+                    }
+                    searchable
+
+                    // onChange={(e: OfferTypeEnum[]) => setActivities(e)}
                 />
                 <Button leftIcon={<IconSearch size={18} />}>
                     Search

@@ -1,3 +1,4 @@
+import { TourTypes } from '@/pages/dashboard/create_tour'
 import { trpc } from '@/utils/trpc'
 import { Button, Group, MultiSelect, Paper, Select, TextInput } from '@mantine/core'
 import { WineTypes, OfferTypeEnum } from '@prisma/client'
@@ -101,10 +102,19 @@ export const WinerySearch = ({
                     onChange={(e: WineTypes) => setTypeOfWine(e)}
                 />
                 <MultiSelect
-                    data={Object.values(OfferTypeEnum).map(type => ({ value: type, label: type }))}
-                    searchable
                     icon={<IconActivity size={18} />}
                     placeholder="Activities"
+                    required
+                    data={
+                        (Object.entries(OfferTypeEnum)).map((tourType, k) => {
+                            return {
+                                label: TourTypes[tourType[1]],
+                                value: tourType[1],
+                            }
+                        })
+                    }
+                    searchable
+
                     onChange={(e: OfferTypeEnum[]) => setActivities(e)}
                 />
 

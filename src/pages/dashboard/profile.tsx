@@ -9,6 +9,26 @@ import { Dropzone, IMAGE_MIME_TYPE } from "@mantine/dropzone";
 import { useForm } from "@mantine/form";
 import { IconPhoto, IconUpload, IconX } from "@tabler/icons";
 import { useSession } from "next-auth/react";
+import type { GetServerSideProps } from 'next';
+import { getServerAuthSession } from '@/server/common/get-server-auth-session';
+
+export const getServerSideProps: GetServerSideProps = async (context) => {
+    const session = await getServerAuthSession({
+        req: context.req,
+        res: context.res,
+    });
+
+    if (!session) {
+        return {
+            redirect: {
+                destination: "/login",
+                permanent: false,
+            },
+        };
+    }
+
+    return { props: {} };
+};
 
 export type UpdateProfile = {
     name: string,

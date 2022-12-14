@@ -33,10 +33,6 @@ const details = {
         {
           "link": "/regions",
           "label": "Regions"
-        },
-        {
-          "link": "/subregions",
-          "label": "Sub Regions"
         }
       ]
     }

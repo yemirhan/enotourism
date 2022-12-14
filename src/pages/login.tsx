@@ -40,6 +40,7 @@ export function Login(props: PaperProps) {
   const mutation = trpc.auth.register.useMutation({
     onError: (e) => setErrorMessage(e.message),
     onSuccess: () => {
+      toggle()
       showNotification({
         message: "Please login now.",
         title: "You have successfully registered!",

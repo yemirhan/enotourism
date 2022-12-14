@@ -19,7 +19,26 @@ import {
 } from "firebase/storage";
 import { storage } from "@/utils/firebase";
 import { v4 } from "uuid";
+import type { GetServerSideProps } from 'next';
+import { getServerAuthSession } from '@/server/common/get-server-auth-session';
 
+export const getServerSideProps: GetServerSideProps = async (context) => {
+    const session = await getServerAuthSession({
+        req: context.req,
+        res: context.res,
+    });
+
+    if (!session) {
+        return {
+            redirect: {
+                destination: "/login",
+                permanent: false,
+            },
+        };
+    }
+
+    return { props: {} };
+};
 const CreateOffer = () => {
     const theme = useMantineTheme();
     const { mutate: createOffer, isLoading } = trpc.offer.createOffer.useMutation()

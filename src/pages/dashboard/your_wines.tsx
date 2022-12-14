@@ -4,6 +4,26 @@ import { trpc } from '@/utils/trpc';
 import { Button, Container, Group, Stack, Table, Title } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import React from 'react'
+import type { GetServerSideProps } from 'next';
+import { getServerAuthSession } from '@/server/common/get-server-auth-session';
+
+export const getServerSideProps: GetServerSideProps = async (context) => {
+    const session = await getServerAuthSession({
+        req: context.req,
+        res: context.res,
+    });
+
+    if (!session) {
+        return {
+            redirect: {
+                destination: "/login",
+                permanent: false,
+            },
+        };
+    }
+
+    return { props: {} };
+};
 
 export const YourWines = () => {
     const [opened, { toggle, close, open }] = useDisclosure(false);

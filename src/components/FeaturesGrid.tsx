@@ -102,11 +102,12 @@ import {
   
     return (
       <Container className={classes.wrapper}>
-        <Title className={classes.title}>{title}</Title>
+        <Title className={classes.title}>Are you a Wine Enthusiast, Winery Owner, or maybe a Tour Guide? 
+Doesn’t matter our website is for all of you!</Title>
   
         <Container size={560} p={0}>
           <Text size="sm" className={classes.description}>
-            {description}
+          Unlike other platforms we support all people connected to wine tourism. If you are looking for some tours or wine destinations this is the perfect place for you. If you want to promote your vineyards or your tours it’s also the best option to chose. Check our offer now by registering in our system!
           </Text>
         </Container>
   

@@ -6,7 +6,26 @@ import { TRPCError } from '@trpc/server'
 import dayjs from 'dayjs'
 import { useRouter } from 'next/router'
 import React from 'react'
+import type { GetServerSideProps } from 'next';
+import { getServerAuthSession } from '@/server/common/get-server-auth-session';
 
+export const getServerSideProps: GetServerSideProps = async (context) => {
+    const session = await getServerAuthSession({
+        req: context.req,
+        res: context.res,
+    });
+
+    if (!session) {
+        return {
+            redirect: {
+                destination: "/login",
+                permanent: false,
+            },
+        };
+    }
+
+    return { props: {} };
+};
 const Reservations = () => {
     const { data: reservations, isLoading, isError } = trpc.reservations.getReservationsOfUser.useQuery()
     console.log(reservations);

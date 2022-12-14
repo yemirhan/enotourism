@@ -257,7 +257,9 @@ const RightSideSignedIn = () => {
                 <Menu.Item icon={<IconSettings size={14} stroke={1.5} />}>Account Settings</Menu.Item>
 
                 <Menu.Item onClick={() => {
-                    signOut()
+                    signOut({
+                        callbackUrl: "/login"
+                    })
                 }} icon={<IconLogout size={14} stroke={1.5} />}>Logout</Menu.Item>
 
 

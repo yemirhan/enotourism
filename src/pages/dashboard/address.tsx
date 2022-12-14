@@ -1,4 +1,5 @@
 import ProtectedLayout from '@/components/layout/ProtectedLayout'
+
 import { trpc } from '@/utils/trpc';
 import type { IAddress } from '@/validation/address';
 import { Button, Checkbox, Container, Grid, Group, Select, Stack, Textarea, TextInput, Title } from '@mantine/core'
@@ -6,8 +7,29 @@ import { useForm } from '@mantine/form';
 import { showNotification } from '@mantine/notifications';
 
 import { IconCheck, IconDeviceFloppy, IconExclamationMark } from '@tabler/icons';
+
 import React, { useEffect, useState } from 'react'
 
+import type { GetServerSideProps } from 'next';
+import { getServerAuthSession } from '@/server/common/get-server-auth-session';
+
+export const getServerSideProps: GetServerSideProps = async (context) => {
+    const session = await getServerAuthSession({
+        req: context.req,
+        res: context.res,
+    });
+
+    if (!session) {
+        return {
+            redirect: {
+                destination: "/login",
+                permanent: false,
+            },
+        };
+    }
+
+    return { props: {} };
+};
 const Address = () => {
     const { data: address } = trpc.address.getAddress.useQuery();
     const { data: countries } = trpc.countries.getCountries.useQuery()

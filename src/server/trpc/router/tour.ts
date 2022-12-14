@@ -61,7 +61,8 @@ export const tourRouter = router({
               }
             }
           }
-        }
+        },
+        photos: true,
       }
     });
   }),

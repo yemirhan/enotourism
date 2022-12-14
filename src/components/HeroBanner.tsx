@@ -1,4 +1,5 @@
 import { createStyles, Container, Title, Text, Button } from '@mantine/core';
+import Link from 'next/link';
 
 const useStyles = createStyles((theme) => ({
   root: {
@@ -97,6 +98,8 @@ export function HeroBanner() {
 
             <Button
               variant="gradient"
+              component={Link}
+              href="/tours"
               gradient={{ from: 'pink', to: 'yellow' }}
               size="xl"
               className={classes.control}

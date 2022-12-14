@@ -43,6 +43,7 @@ export const reservationRoutes = router({
               adult_price: true,
               kid_price: true,
               name: true,
+
               OfferTimeSlot: {
                 select: {
                   startDate: true,
@@ -87,6 +88,34 @@ export const reservationRoutes = router({
           tourGuideId: ctx.session.user.id
         },
         include: {
+          tour: {
+            select: {
+              name: true,
+              address: true,
+              startDate: true,
+              startTime: true,
+              endDate: true,
+              price_per_adult: true,
+              price_per_kid: true,
+              id: true,
+              TourActivities: {
+                select: {
+                  activity: true,
+                  id: true,
+                }
+              },
+
+              Winery: {
+                select: {
+                  id: true,
+                  name: true,
+                  description: true,
+                }
+              },
+
+            }
+          },
+
           user: {
             select: {
               name: true,
